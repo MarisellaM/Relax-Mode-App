@@ -1,16 +1,22 @@
-
-
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import CustomButton from '../components/CustomButton';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/RootNavigator';
+import { Image } from 'expo-image';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Home'>;
 
 const HomeScreen: React.FC<Props> = ({ navigation }) => {
   return (
     <View style={styles.container}>
+      //add logo to display on home screen
+      <Image 
+        source={require('../assets/images/icon.png')}
+        style={{ width: 120, height: 120, marginBottom: 20 }}
+        contentFit="contain"
+      />
+
       <Text style={styles.title}>Welcome to Relax Mode</Text>
       <Text style={styles.subtitle}>A simple base to our app.</Text>
 
@@ -55,5 +61,3 @@ const styles = StyleSheet.create({
 });
 
 export default HomeScreen;
-
-

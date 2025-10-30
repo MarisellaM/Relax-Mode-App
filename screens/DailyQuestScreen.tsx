@@ -110,6 +110,11 @@ const DailyQuestScreen: React.FC<Props> = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
+      <Image
+        source={require('../assets/images/DailyQuest.png')}
+        style={{ width: 500, height: 200, marginBottom: 20 }}
+        contentFit="contain"
+      />
       <Text style={styles.title}>Daily Quest</Text>
       <Text style={styles.task}>{task}</Text>
 
