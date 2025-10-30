@@ -5,6 +5,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import CountdownTimer from '../components/CountdownTimer';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/RootNavigator';
+import { Image } from 'expo-image';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'DailyQuest'>;
 
@@ -129,7 +130,8 @@ const DailyQuestScreen: React.FC<Props> = ({ navigation }) => {
       {isRunning && (
         <>
           <CountdownTimer
-            duration={300}
+          // Change back to 300 for a 5-minute timer - Mari
+            duration={10}
             onComplete={handleComplete}
             isRunning={isRunning}
           />
@@ -142,8 +144,15 @@ const DailyQuestScreen: React.FC<Props> = ({ navigation }) => {
 
       {isComplete && (
         <Animated.View style={{ opacity: fadeAnim, alignItems: 'center' }}>
-          <Text style={styles.congrats}>Well done!</Text>
-          <Text style={styles.streak}>Current Streak: {streak} day{streak === 1 ? '' : 's'}</Text>
+          
+          <Image
+           source={require('../assets/images/congrats.gif')}
+            style={{ width: 150, height: 150, marginBottom: 10 }}
+            contentFit="contain"
+          />
+
+          <Text style={styles.congrats}>🌞 Well done!</Text>
+          <Text style={styles.streak}>✨ Current Streak: {streak} day{streak === 1 ? '' : 's'}</Text>
 
           <TouchableOpacity style={[styles.button, styles.secondary]} onPress={handleReset}>
             <Text style={[styles.buttonText, styles.textSecondary]}>Do Another</Text>
