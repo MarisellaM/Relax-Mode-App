@@ -29,6 +29,11 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
         title="Start Relaxation"
         onPress={() => navigation.navigate('Relaxation')}
       />
+// Add achievement page button (levels), levels.tsx
+    <CustomButton
+        title="Levels"
+        onPress={() => navigation.navigate('Levels')}
+      />  
 
       <CustomButton
         title="Settings"
@@ -59,5 +64,8 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
 });
+// Add achievement page button (levels)
 
+
+// Add routine page  (routinesTracker)
 export default HomeScreen;

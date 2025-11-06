@@ -172,6 +172,16 @@ const DailyQuestScreen: React.FC<Props> = ({ navigation }) => {
   );
 };
 
+//Store the number of completed daily quests to update levels screen
+const LoadDailyQuestData = async () => {
+  try {
+    const completedQuests = await AsyncStorage.getItem('completedQuests');
+    return completedQuests ? JSON.parse(completedQuests) : 0;
+  } catch (e) {
+    console.warn('Failed to load completed quests', e);
+    return 0;
+  }
+};
 const styles = StyleSheet.create({
   container: {
     flex: 1,

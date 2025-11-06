@@ -4,11 +4,14 @@ import { View, Text, StyleSheet } from 'react-native';
 const RelaxationScreen = () => {
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>not implemented</Text>
+      <Text style={styles.text}>Enter Relax Mode</Text>
     </View>
   );
 };
 
+// Play a relaxing song or soundscape in the background
+
+// Change the color of a wyze light bulb to a calming color (a green or blue hue)
 const styles = StyleSheet.create({
   container: {
     flex: 1,
