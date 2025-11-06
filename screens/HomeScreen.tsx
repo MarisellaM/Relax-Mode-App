@@ -25,6 +25,11 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
       />
 
       <CustomButton
+        title="Levels"
+        onPress={() => navigation.navigate('Levels')}
+      />
+
+      <CustomButton
         title="Settings"
         onPress={() => navigation.navigate('Settings')}
         secondary
