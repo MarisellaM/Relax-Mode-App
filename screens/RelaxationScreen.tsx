@@ -9,9 +9,9 @@ const RelaxationScreen = () => {
   );
 };
 
-// Play a relaxing song or soundscape in the background
+/* Play a relaxing song or soundscape in the background */
 
-// Change the color of a wyze light bulb to a calming color (a green or blue hue)
+/* Change the color of a wyze light bulb to a calming color (a green or blue hue)*/
 const styles = StyleSheet.create({
   container: {
     flex: 1,

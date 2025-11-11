@@ -1,14 +1,17 @@
-//Create levels screen
+/*Create levels screen*/
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-// import load daily quest data to track progress
+/* import load daily quest data to track progress*/
 
 
-//connect to home button levels
+/*connect to home button levels*/
 import { RootStackParamList } from '../navigation/RootNavigator';
 
 import { Image } from 'expo-image';
+
+type LevelNumber = number;
+type ProgressNumber = number;
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Levels'>;
 const LevelsScreen: React.FC<Props> = ({ navigation }) => {
@@ -27,10 +30,10 @@ const LevelsScreen: React.FC<Props> = ({ navigation }) => {
         </View>
     );
 };
-//Create the level bar that updates based on quests and will take this data from daily quest screen
+/* Create the level bar that updates based on quests and will take this data from daily quest screen */
 type LevelBarProps = {
     level: LevelNumber;
-    progress: ProgressNumber; // progress towards next level (0-100)
+    progress: ProgressNumber; /* progress towards next level (0-100)*/
 };
 const LevelBar: React.FC<LevelBarProps> = ({ level, progress }) => {
     return (
@@ -43,13 +46,12 @@ const LevelBar: React.FC<LevelBarProps> = ({ level, progress }) => {
     );
 }
 
-// level number based on quest completion from daily quest screen
-// level 1 = 0-2 quests completed
-
-//level 2 = 3-6 quests completed
-// level 3 = 7-10 quests completed
-// level 4 = 11-15 quests completed
-// progress percentage based on quests completed towards next level
+/* level number based on quest completion from daily quest screen and updates level bar */
+/* level 1 = 0-2 quests completed */
+/* level 2 = 3-6 quests completed */
+/* level 3 = 7-10 quests completed */
+/* level 4 = 11-15 quests completed */
+/*  progress percentage based on quests completed towards next level */
 
 
 const styles = StyleSheet.create({

@@ -83,7 +83,7 @@ const DailyQuestScreen: React.FC<Props> = ({ navigation }) => {
         if (diffDays === 1) {
           newStreak = streak + 1;
         } else {
-          // broke streak; reset to 1 (today)
+          /*  broke streak; reset to 1 (today) */
           newStreak = 1;
         }
       }
@@ -135,7 +135,7 @@ const DailyQuestScreen: React.FC<Props> = ({ navigation }) => {
       {isRunning && (
         <>
           <CountdownTimer
-          // Change back to 300 for a 5-minute timer - Mari
+          /* Change back to 300 for a 5-minute timer - Mari */
             duration={10}
             onComplete={handleComplete}
             isRunning={isRunning}
@@ -172,7 +172,7 @@ const DailyQuestScreen: React.FC<Props> = ({ navigation }) => {
   );
 };
 
-//Store the number of completed daily quests to update levels screen
+/* Store the number of completed daily quests to update levels screen*/
 const LoadDailyQuestData = async () => {
   try {
     const completedQuests = await AsyncStorage.getItem('completedQuests');
