@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Animated, Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -6,6 +5,7 @@ import CountdownTimer from '../components/CountdownTimer';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/RootNavigator';
 import { Image } from 'expo-image';
+
 
 type Props = NativeStackScreenProps<RootStackParamList, 'DailyQuest'>;
 
@@ -64,7 +64,7 @@ const DailyQuestScreen: React.FC<Props> = ({ navigation }) => {
     setIsComplete(true);
     setIsRunning(false);
 
-    // Basic streak logic
+    /* Basic streak logic */
     try {
       const last = await AsyncStorage.getItem(LAST_COMPLETED_KEY);
       const today = new Date();
@@ -74,10 +74,10 @@ const DailyQuestScreen: React.FC<Props> = ({ navigation }) => {
       if (!last) {
         newStreak = streak + 1;
       } else if (last === todayStr) {
-        // already completed today - no increment
+        /* already completed today - no increment */
         Alert.alert('Already counted', 'You already completed a quest today.');
       } else {
-        // check if last was yesterday
+        /* check if last was yesterday */
         const lastDate = new Date(last);
         const diffDays = Math.floor((today.getTime() - lastDate.getTime()) / (1000 * 60 * 60 * 24));
         if (diffDays === 1) {
@@ -90,6 +90,7 @@ const DailyQuestScreen: React.FC<Props> = ({ navigation }) => {
 
       await saveStreak(newStreak);
       await markCompletedToday();
+      await incrementCompletedQuests();
 
       Animated.timing(fadeAnim, {
         toValue: 1,
@@ -182,6 +183,15 @@ const LoadDailyQuestData = async () => {
     return 0;
   }
 };
+
+async function incrementCompletedQuests(): Promise<number> {
+  const raw = await AsyncStorage.getItem('completedQuests');
+  const current = raw ? JSON.parse(raw) as number : 0;
+  const next = current + 1;
+  await AsyncStorage.setItem('completedQuests', JSON.stringify(next));
+  return next;
+}
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,

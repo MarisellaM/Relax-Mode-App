@@ -47,6 +47,7 @@ const LevelBar: React.FC<LevelBarProps> = ({ level, progress }) => {
 }
 
 /* level number based on quest completion from daily quest screen and updates level bar */
+
 /* level 1 = 0-2 quests completed */
 /* level 2 = 3-6 quests completed */
 /* level 3 = 7-10 quests completed */
