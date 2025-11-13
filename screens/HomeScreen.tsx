@@ -17,7 +17,7 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
         contentFit="contain"
       />
 
-      <Text style={styles.title}>Welcome to Relax Mode</Text>
+      <Text style={styles.title}> Welcome to Relax Mode </Text>
       <Text style={styles.subtitle}>A simple base to our app.</Text>
 
       <CustomButton
@@ -63,8 +63,5 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
 });
-/* Add achievement page button (levels)
 
-
- Add routine page  (routinesTracker)*/
 export default HomeScreen; 

@@ -1,4 +1,8 @@
 /*Create levels screen*/
+/*  The user enables "Relaxation Automation" so the app can automatically remind them of cleaning/relaxation through notifications
+  They can view their analytics to see time spent relaxing and time spent cleaning
+  App can provide suggestions based on habits such as "You've cleaned 5 days straight, time to rest for a day."
+*/
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -100,6 +104,25 @@ const LevelBar: React.FC<LevelBarProps> = ({ level, progress }) => {
     </View>
   );
 }
+ 
+/*  The user enables "Relaxation Automation" so the app can automatically remind them of cleaning/relaxation through notifications */
+function relaxationAutomation() {
+  /* Set up notifications to remind user to relax or clean based on their habits will send a test one as 
+  soon as it is turned on for demo use */
+
+} 
+
+ /*They can view their analytics to see time spent relaxing and time spent <cleaning></cleaning*/
+function viewAnalytics() {
+  /* Fetch and display analytics data such as time spent relaxing and cleaning */
+}
+
+/*App can provide suggestions based on habits such as "You've cleaned 5 days straight, time to rest for a day."*/
+function provideSuggestions() {
+  /* Analyze user habits and provide personalized suggestions */
+}
+
+
 
 const styles = StyleSheet.create({
   container: {
