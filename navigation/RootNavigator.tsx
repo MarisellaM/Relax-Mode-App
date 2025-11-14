@@ -6,12 +6,15 @@ import RelaxationScreen from '../screens/RelaxationScreen';
 import SettingsScreen from '../screens/SettingsScreen';
 import DailyQuestScreen from '../screens/DailyQuestScreen';
 import levels from '../screens/levels';
+import AnalyticsScreen from '../screens/AnalyticsScreen'
+
 export type RootStackParamList = {
   Home: undefined;
   Relaxation: undefined;
   Settings: undefined;
   DailyQuest: undefined;
   Levels: undefined;
+  Analytics: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -24,7 +27,8 @@ const RootNavigator = () => {
       <Stack.Screen name="Settings" component={SettingsScreen} options={{ title: 'Settings' }} />
       <Stack.Screen name="DailyQuest" component={DailyQuestScreen} options={{ title: 'Daily Quest' }}/>
       <Stack.Screen name="Levels" component={levels} options={{ title: 'Achievements' }} />
-    </Stack.Navigator>
+      <Stack.Screen name="Analytics" component={AnalyticsScreen} />
+      </Stack.Navigator>
   );
 };
 
