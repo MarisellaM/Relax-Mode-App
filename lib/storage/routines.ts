@@ -16,6 +16,7 @@ export type Routine = {
   items: RoutineItem[];
   time?: string;        // "HH:MM"
   scene: RoutineScene;
+  lastRunAt?: number;
 };
 
 const ROUTINES_KEY = 'routines';

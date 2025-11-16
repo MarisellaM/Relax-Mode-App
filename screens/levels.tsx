@@ -9,7 +9,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { Image } from 'expo-image';
 import { RootStackParamList } from '../navigation/RootNavigator';
-import { loadStats } from '../lib/storage/levels';
 import { useTheme } from '../lib/ThemeContext';
 
 type LevelNumber = number;
@@ -72,7 +71,7 @@ const LevelsScreen: React.FC<Props> = ({ navigation }) => {
   const [completed, setCompleted] = useState<number>(0);
   const { level, progress } = computeLevel(completed);
 
-const [statsSummary, setStatsSummary] = useState<string | null>(null);
+
 
 
   useEffect(() => {
@@ -87,18 +86,7 @@ const [statsSummary, setStatsSummary] = useState<string | null>(null);
     })();
   }, []);
 
-    // also load stats for a small summary on this screen
-  useEffect(() => {
-    (async () => {
-      try {
-        const s = await loadStats();
-        const text = `Relax: ${s.totalRelaxMinutes} min · Cleaning: ${s.totalCleaningMinutes} min · Weekly streaks: ${s.weeklyStreaksCompleted}`;
-        setStatsSummary(text);
-      } catch (e) {
-        console.warn('Failed to load stats for levels summary', e);
-      }
-    })();
-  }, []);
+
 
   const openAnalytics = () => {
     // Ensure 'Analytics' route exists in RootNavigator
@@ -132,11 +120,7 @@ const [statsSummary, setStatsSummary] = useState<string | null>(null);
 
       <Text style={[styles.small, { color: theme.secondaryTextColor }]}>Completed quests: <Text style={{ fontWeight: '700', color: theme.textColor }}>{completed}</Text></Text>
 
-      {statsSummary && (
-        <Text style={[styles.small, { marginTop: 4, color: theme.secondaryTextColor }]}>
-          Overall stats: {statsSummary}
-        </Text>
-      )}
+
 
       <View style={{ width: '100%', marginTop: 12 }}>
         <View style={[styles.featureBox, { borderColor: theme.borderColor }]}>

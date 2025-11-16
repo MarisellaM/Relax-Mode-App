@@ -4,6 +4,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { RootStackParamList } from '../navigation/RootNavigator';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useTheme } from '../lib/ThemeContext';
+import { loadStats } from '../lib/storage/levels';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Analytics'>;
 
@@ -20,10 +21,28 @@ export default function AnalyticsScreen({ navigation }: Props) {
   const [entries, setEntries] = useState<LogEntry[]>([]);
   const [cleanCount, setCleanCount] = useState(0);
   const [relaxCount, setRelaxCount] = useState(0);
+  const [statsSummary, setStatsSummary] = useState<string | null>(null);
 
   useEffect(() => {
+    const unsub = navigation.addListener('focus', () => {
+      loadAnalytics();
+      loadStatsSummary();
+    });
     loadAnalytics();
-  }, []);
+    loadStatsSummary();
+    return unsub;
+  }, [navigation]);
+
+  const loadStatsSummary = async () => {
+  try {
+    const s = await loadStats();
+    console.log('[Analytics] loadStats summary:', s);
+    const text = `Relax: ${s.totalRelaxMinutes} min · Cleaning: ${s.totalCleaningMinutes} min · Weekly streaks: ${s.weeklyStreaksCompleted}`;
+    setStatsSummary(text);
+  } catch (e) {
+    console.warn('Failed to load stats summary', e);
+  }
+};
 
   const loadAnalytics = async () => {
     try {
@@ -69,6 +88,21 @@ export default function AnalyticsScreen({ navigation }: Props) {
           <Text style={[styles.cardValue, { color: theme.textColor }]}>{relaxCount}</Text>
         </View>
       </View>
+
+{statsSummary && (
+  <View style={[styles.card, { marginTop: 10, backgroundColor: theme.cardBackground }]}>
+    <Text style={[styles.cardLabel, { color: theme.secondaryTextColor }]}>
+      Overall Stats
+    </Text>
+    <Text style={{ marginTop: 6, color: theme.textColor }}>
+      {statsSummary}
+    </Text>
+  </View>
+)}
+
+<Text style={{ marginTop: 16, fontSize: 12, color: '#999', textAlign: 'center' }}>
+  Cleaning and relaxation sessions are tracked from Relaxation Mode and Daily Quest.
+</Text>
 
       <View style={styles.insightBox}>
         <Text style={styles.insightTitle}>Insight</Text>

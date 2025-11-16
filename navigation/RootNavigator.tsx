@@ -10,6 +10,7 @@ import CreateRoutineScreen from '../screens/CreateRoutineScreen';
 import AutomationScreen from '../screens/AutomationScreen';
 import levels from '../screens/levels';
 import AnalyticsScreen from '../screens/AnalyticsScreen'
+import RoutineTrackerScreen from '../screens/routinesTracker';
 
 export type RootStackParamList = {
   Home: undefined;
@@ -21,6 +22,7 @@ export type RootStackParamList = {
   Automation: undefined;
   Levels: undefined;
   Analytics: undefined;
+  RoutineTracker: { routineId: string };
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -37,6 +39,7 @@ const RootNavigator = () => {
       <Stack.Screen name="Automation" component={AutomationScreen} options={{ title: 'Automation' }} />
       <Stack.Screen name="Levels" component={levels} options={{ title: 'Achievements' }} />
       <Stack.Screen name="Analytics" component={AnalyticsScreen} />
+      <Stack.Screen name="RoutineTracker" component={RoutineTrackerScreen} options={{ title: 'Routine Path' }} />
       </Stack.Navigator>
   );
 };
