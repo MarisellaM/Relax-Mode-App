@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Animated, Easing, } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTheme } from '../lib/ThemeContext';
+import { testPlaySound } from '../lib/testSound';
 
 type LogEntry = {
   id: string;
@@ -58,6 +59,10 @@ const RelaxationScreen: React.FC = () => {
   const handleSelect = async (nextMode: 'relax' | 'clean') => {
     setMode(nextMode);
     await logActivity(nextMode);
+
+    // Play sound when selecting a mode (40 seconds for relaxation)
+    console.log('[RelaxationScreen] Playing mode selection sound for 40 seconds...');
+    await testPlaySound(40);
   };
 
   const backgroundColor = anim.interpolate({

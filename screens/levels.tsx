@@ -22,7 +22,7 @@ type LevelBarProps = {
 };
 
 // compute level and progress percent from completed quests count
-function computeLevel(completed: number): { level: LevelNumber; progress: ProgressNumber } {
+export function computeLevel(completed: number): { level: LevelNumber; progress: ProgressNumber } {
   if (completed <= 2) {
     const start = 0, size = 3; // 0,1,2 -> level 1
     const pct = ((completed - start) / size) * 100;

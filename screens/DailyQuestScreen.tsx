@@ -7,6 +7,9 @@ import { RootStackParamList } from '../navigation/RootNavigator';
 import { Image } from 'expo-image';
 import { loadStats, saveStats } from '../lib/storage/levels';
 import { useTheme } from '../lib/ThemeContext';
+import { playSoundEffect } from '../lib/soundEffects';
+import { computeLevel } from './levels';
+import { testPlaySound } from '../lib/testSound';
 
 
 
@@ -112,9 +115,35 @@ const DailyQuestScreen: React.FC<Props> = ({ navigation }) => {
 
       await saveStreak(newStreak);
       await markCompletedToday();
+
+      // Check for level up
+      const beforeCount = await LoadDailyQuestData();
+      const levelBefore = computeLevel(beforeCount);
+
       await incrementCompletedQuests();
 
-      await recordDailyQuestCompletion(QUEST_DURATION_SECONDS); 
+      const afterCount = beforeCount + 1;
+      const levelAfter = computeLevel(afterCount);
+
+      await recordDailyQuestCompletion(QUEST_DURATION_SECONDS);
+
+      // Play completion sound (or special level up sound)
+      console.log('[DailyQuest] About to play completion sound...');
+      if (levelAfter.level > levelBefore.level) {
+        // Level up! Play sound and show alert
+        console.log('[DailyQuest] Level up detected! Playing sound...');
+        await testPlaySound();
+        Alert.alert(
+          '🎉 Level Up!',
+          `Congratulations! You've reached Level ${levelAfter.level}!`,
+          [{ text: 'Awesome!', style: 'default' }]
+        );
+      } else {
+        // Regular completion sound
+        console.log('[DailyQuest] Regular completion, playing sound...');
+        await testPlaySound();
+      }
+      console.log('[DailyQuest] Sound should have played');
 
       Animated.timing(fadeAnim, {
         toValue: 1,
@@ -153,6 +182,13 @@ const DailyQuestScreen: React.FC<Props> = ({ navigation }) => {
             setTask(TASKS[Math.floor(Math.random() * TASKS.length)]);
           }}>
             <Text style={[styles.buttonText, styles.textSecondary]}>New Task</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={[styles.button, styles.testButton]} onPress={() => {
+            console.log('Test button pressed');
+            testPlaySound();
+          }}>
+            <Text style={[styles.buttonText, styles.textSecondary]}>🔊 Test Sound</Text>
           </TouchableOpacity>
         </>
       )}
@@ -250,6 +286,9 @@ const styles = StyleSheet.create({
   },
   secondary: {
     backgroundColor: '#efefef',
+  },
+  testButton: {
+    backgroundColor: '#f39c12',
   },
   textSecondary: {
     color: '#333',
