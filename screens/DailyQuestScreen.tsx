@@ -6,6 +6,7 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/RootNavigator';
 import { Image } from 'expo-image';
 import { loadStats, saveStats } from '../lib/storage/levels';
+import { useTheme } from '../lib/ThemeContext';
 
 
 
@@ -41,6 +42,7 @@ async function recordDailyQuestCompletion(durationSeconds: number) {
 }
 
 const DailyQuestScreen: React.FC<Props> = ({ navigation }) => {
+  const { theme } = useTheme();
   const [task, setTask] = useState<string>('');
   const [isRunning, setIsRunning] = useState(false);
   const [isComplete, setIsComplete] = useState(false);
@@ -132,14 +134,14 @@ const DailyQuestScreen: React.FC<Props> = ({ navigation }) => {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: theme.backgroundColor }]}>
       <Image
         source={require('../assets/images/DailyQuest.png')}
         style={{ width: 500, height: 200, marginBottom: 20 }}
         contentFit="contain"
       />
-      <Text style={styles.title}>Daily Quest</Text>
-      <Text style={styles.task}>{task}</Text>
+      <Text style={[styles.title, { color: theme.textColor }]}>Daily Quest</Text>
+      <Text style={[styles.task, { color: theme.textColor }]}>{task}</Text>
 
       {!isRunning && !isComplete && (
         <>
@@ -180,7 +182,7 @@ const DailyQuestScreen: React.FC<Props> = ({ navigation }) => {
           />
 
           <Text style={styles.congrats}>🌞 Well done!</Text>
-          <Text style={styles.streak}>✨ Current Streak: {streak} day{streak === 1 ? '' : 's'}</Text>
+          <Text style={[styles.streak, { color: theme.textColor }]}>✨ Current Streak: {streak} day{streak === 1 ? '' : 's'}</Text>
 
           <TouchableOpacity style={[styles.button, styles.secondary]} onPress={handleReset}>
             <Text style={[styles.buttonText, styles.textSecondary]}>Do Another</Text>
@@ -220,7 +222,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
-    backgroundColor: '#fff',
   },
   title: {
     fontSize: 26,
@@ -231,7 +232,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     textAlign: 'center',
     marginBottom: 30,
-    color: '#333',
     paddingHorizontal: 10,
   },
   button: {
@@ -262,7 +262,6 @@ const styles = StyleSheet.create({
   },
   streak: {
     fontSize: 16,
-    color: '#333',
     marginBottom: 20,
   },
 });

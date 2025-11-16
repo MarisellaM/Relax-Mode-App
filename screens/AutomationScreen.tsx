@@ -1,21 +1,23 @@
 
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, Switch, TouchableOpacity } from 'react-native';
+import { useTheme } from '../lib/ThemeContext';
 
 const AutomationScreen: React.FC = () => {
+  const { theme } = useTheme();
   const [enabled, setEnabled] = useState(false);
   const [scene, setScene] = useState<'normal' | 'dim' | 'ambient'>('dim');
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Relaxation Automation</Text>
+    <View style={[styles.container, { backgroundColor: theme.backgroundColor }]}>
+      <Text style={[styles.title, { color: theme.textColor }]}>Relaxation Automation</Text>
 
       <View style={styles.row}>
-        <Text style={styles.label}>Enable Automation</Text>
+        <Text style={[styles.label, { color: theme.textColor }]}>Enable Automation</Text>
         <Switch value={enabled} onValueChange={setEnabled} />
       </View>
 
-      <Text style={styles.sectionTitle}>Preview Scene</Text>
+      <Text style={[styles.sectionTitle, { color: theme.textColor }]}>Preview Scene</Text>
       <View style={styles.sceneRow}>
         {(['normal', 'dim', 'ambient'] as const).map((s) => (
           <TouchableOpacity
@@ -50,7 +52,7 @@ const AutomationScreen: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 16, backgroundColor: '#fff' },
+  container: { flex: 1, padding: 16 },
   title: { fontSize: 22, fontWeight: '700', marginBottom: 16 },
   row: {
     flexDirection: 'row',

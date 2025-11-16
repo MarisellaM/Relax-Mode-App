@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { RootStackParamList } from '../navigation/RootNavigator';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { useTheme } from '../lib/ThemeContext';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Analytics'>;
 
@@ -15,6 +16,7 @@ type LogEntry = {
 const LOG_KEY = "logEntries";
 
 export default function AnalyticsScreen({ navigation }: Props) {
+  const { theme } = useTheme();
   const [entries, setEntries] = useState<LogEntry[]>([]);
   const [cleanCount, setCleanCount] = useState(0);
   const [relaxCount, setRelaxCount] = useState(0);
@@ -47,30 +49,30 @@ export default function AnalyticsScreen({ navigation }: Props) {
   })();
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.title}>Your Analytics</Text>
-      <Text style={styles.subtitle}>Track your habits over time</Text>
+    <ScrollView contentContainerStyle={[styles.container, { backgroundColor: theme.backgroundColor }]}>
+      <Text style={[styles.title, { color: theme.textColor }]}>Your Analytics</Text>
+      <Text style={[styles.subtitle, { color: theme.secondaryTextColor }]}>Track your habits over time</Text>
 
-      <View style={styles.card}>
-        <Text style={styles.cardLabel}>Total Activity</Text>
-        <Text style={styles.cardValue}>{total}</Text>
+      <View style={[styles.card, { backgroundColor: theme.cardBackground }]}>
+        <Text style={[styles.cardLabel, { color: theme.secondaryTextColor }]}>Total Activity</Text>
+        <Text style={[styles.cardValue, { color: theme.textColor }]}>{total}</Text>
       </View>
 
       <View style={styles.row}>
-        <View style={styles.cardSmall}>
-          <Text style={styles.cardLabel}>Cleaning</Text>
-          <Text style={styles.cardValue}>{cleanCount}</Text>
+        <View style={[styles.cardSmall, { backgroundColor: theme.cardBackground }]}>
+          <Text style={[styles.cardLabel, { color: theme.secondaryTextColor }]}>Cleaning</Text>
+          <Text style={[styles.cardValue, { color: theme.textColor }]}>{cleanCount}</Text>
         </View>
 
-        <View style={styles.cardSmall}>
-          <Text style={styles.cardLabel}>Relaxing</Text>
-          <Text style={styles.cardValue}>{relaxCount}</Text>
+        <View style={[styles.cardSmall, { backgroundColor: theme.cardBackground }]}>
+          <Text style={[styles.cardLabel, { color: theme.secondaryTextColor }]}>Relaxing</Text>
+          <Text style={[styles.cardValue, { color: theme.textColor }]}>{relaxCount}</Text>
         </View>
       </View>
 
       <View style={styles.insightBox}>
         <Text style={styles.insightTitle}>Insight</Text>
-        <Text style={styles.insightText}>{insight}</Text>
+        <Text style={[styles.insightText, { color: theme.textColor }]}>{insight}</Text>
       </View>
     </ScrollView>
   );
@@ -79,7 +81,6 @@ export default function AnalyticsScreen({ navigation }: Props) {
 const styles = StyleSheet.create({
   container: {
     padding: 20,
-    backgroundColor: "#fff",
     minHeight: "100%",
   },
   title: {
@@ -91,7 +92,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     textAlign: "center",
     marginBottom: 20,
-    color: "#666",
   },
   row: {
     flexDirection: "row",
@@ -99,7 +99,6 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   card: {
-    backgroundColor: "#f3f4f6",
     padding: 20,
     borderRadius: 12,
     alignItems: "center",
@@ -111,7 +110,6 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   cardSmall: {
-    backgroundColor: "#f3f4f6",
     padding: 20,
     borderRadius: 12,
     alignItems: "center",
@@ -123,7 +121,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     elevation: 2,
   },
-  cardLabel: { fontSize: 16, color: "#666" },
+  cardLabel: { fontSize: 16 },
   cardValue: { fontSize: 32, fontWeight: "700", marginTop: 5 },
   insightBox: {
     backgroundColor: "#e0f2fe",
@@ -136,5 +134,5 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     marginBottom: 6,
   },
-  insightText: { fontSize: 16, color: "#333" },
+  insightText: { fontSize: 16 },
 });

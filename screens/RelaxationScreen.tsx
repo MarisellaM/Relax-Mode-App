@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Animated, Easing, } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useTheme } from '../lib/ThemeContext';
 
 type LogEntry = {
   id: string;
@@ -28,6 +29,7 @@ async function logActivity(type: 'clean' | 'relax') {
 }
 
 const RelaxationScreen: React.FC = () => {
+  const { theme } = useTheme();
   const [mode, setMode] = useState<'relax' | 'clean' | null>(null);
 
   // animated value that loops 0-1 for color interpolation
@@ -65,7 +67,9 @@ const RelaxationScreen: React.FC = () => {
         ? ['#FFFDE7', '#FFF3CD'] // warm light-yellows for cleaning
         : mode === 'relax'
         ? ['#E0F7FA', '#D1C4E9'] // cool teal/purple for relaxing
-        : ['#F4F6F7', '#EBF5FB'], // neutral when no mode chosen
+        : theme.isDark
+        ? [theme.backgroundColor, theme.backgroundColor] // use theme background in dark mode
+        : ['#F4F6F7', '#EBF5FB'], // neutral light colors when no mode chosen
   });
 
   const title =
@@ -92,8 +96,8 @@ const RelaxationScreen: React.FC = () => {
   return (
     <Animated.View style={[styles.container, { backgroundColor }]}>
       <View style={styles.content}>
-        <Text style={styles.title}>{title}</Text>
-        <Text style={styles.subtitle}>{subtitle}</Text>
+        <Text style={[styles.title, { color: theme.textColor }]}>{title}</Text>
+        <Text style={[styles.subtitle, { color: theme.secondaryTextColor }]}>{subtitle}</Text>
 
         <View style={styles.buttonRow}>
           <TouchableOpacity
@@ -132,16 +136,16 @@ const RelaxationScreen: React.FC = () => {
         </View>
 
         {mode && (
-          <View style={styles.card}>
-            <Text style={styles.cardTitle}>
+          <View style={[styles.card, { backgroundColor: theme.cardBackground }]}>
+            <Text style={[styles.cardTitle, { color: theme.textColor }]}>
               {mode === 'relax' ? 'Suggested Relaxation' : 'Suggested Cleaning'}
             </Text>
-            <Text style={styles.cardBody}>
+            <Text style={[styles.cardBody, { color: theme.textColor }]}>
               {mode === 'relax'
                 ? 'Put your phone down for a moment, close your eyes, and match your breathing to the gentle light shifts.'
                 : 'Pick one small spot (desk, counter, or nightstand) and clean along with the energizing light.'}
             </Text>
-            <Text style={styles.cardHint}>
+            <Text style={[styles.cardHint, { color: theme.secondaryTextColor }]}>
               This session has been added to your analytics.
             </Text>
           </View>
@@ -149,9 +153,9 @@ const RelaxationScreen: React.FC = () => {
       </View>
 
       {/* status bar at bottom */}
-      <View style={styles.statusBar}>
-        <Text style={styles.statusText}>{statusText}</Text>
-        <Text style={styles.statusSub}>
+      <View style={[styles.statusBar, { borderTopColor: theme.borderColor, backgroundColor: theme.cardBackground }]}>
+        <Text style={[styles.statusText, { color: theme.secondaryTextColor }]}>{statusText}</Text>
+        <Text style={[styles.statusSub, { color: theme.secondaryTextColor }]}>
           (In the future, you would be able to control smart devices here)
         </Text>
       </View>
@@ -176,11 +180,9 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     marginBottom: 8,
     textAlign: 'center',
-    color: '#1B2631',
   },
   subtitle: {
     fontSize: 16,
-    color: '#4D5656',
     textAlign: 'center',
     marginBottom: 28,
   },
@@ -214,7 +216,6 @@ const styles = StyleSheet.create({
     color: '#ffffff',
   },
   card: {
-    backgroundColor: '#ffffffee',
     borderRadius: 18,
     padding: 18,
     width: '100%',
@@ -229,32 +230,25 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '700',
     marginBottom: 8,
-    color: '#1F2D3D',
   },
   cardBody: {
     fontSize: 15,
-    color: '#4A4A4A',
     marginBottom: 10,
   },
   cardHint: {
     fontSize: 13,
-    color: '#7F8C8D',
     marginTop: 4,
   },
   statusBar: {
     paddingHorizontal: 16,
     paddingVertical: 10,
     borderTopWidth: 1,
-    borderTopColor: '#D6DBDF',
-    backgroundColor: '#ffffffcc',
   },
   statusText: {
     fontSize: 13,
-    color: '#5D6D7E',
   },
   statusSub: {
     fontSize: 12,
-    color: '#A6ACAF',
     marginTop: 2,
   },
 });

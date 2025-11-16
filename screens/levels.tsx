@@ -10,6 +10,7 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { Image } from 'expo-image';
 import { RootStackParamList } from '../navigation/RootNavigator';
 import { loadStats } from '../lib/storage/levels';
+import { useTheme } from '../lib/ThemeContext';
 
 type LevelNumber = number;
 type ProgressNumber = number;
@@ -67,6 +68,7 @@ function suggestionFromCompleted(completed: number) {
 const COMPLETED_KEY = 'completedQuests';
 
 const LevelsScreen: React.FC<Props> = ({ navigation }) => {
+  const { theme } = useTheme();
   const [completed, setCompleted] = useState<number>(0);
   const { level, progress } = computeLevel(completed);
 
@@ -115,31 +117,31 @@ const [statsSummary, setStatsSummary] = useState<string | null>(null);
 
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <ScrollView contentContainerStyle={[styles.container, { backgroundColor: theme.backgroundColor }]}>
       <Image
         source={require('../assets/images/achievement.png')}
         style={{ width: 180, height: 180, marginBottom: 18 }}
         contentFit="contain"
       />
-      <Text style={styles.title}>Achievements</Text>
-      <Text style={styles.subtitle}>
+      <Text style={[styles.title, { color: theme.textColor }]}>Achievements</Text>
+      <Text style={[styles.subtitle, { color: theme.secondaryTextColor }]}>
         Track your progress and unlock new levels as you complete more quests!
       </Text>
 
       <LevelBar level={level} progress={progress} />
 
-      <Text style={styles.small}>Completed quests: <Text style={{ fontWeight: '700' }}>{completed}</Text></Text>
-      
+      <Text style={[styles.small, { color: theme.secondaryTextColor }]}>Completed quests: <Text style={{ fontWeight: '700', color: theme.textColor }}>{completed}</Text></Text>
+
       {statsSummary && (
-        <Text style={[styles.small, { marginTop: 4 }]}>
+        <Text style={[styles.small, { marginTop: 4, color: theme.secondaryTextColor }]}>
           Overall stats: {statsSummary}
         </Text>
       )}
 
       <View style={{ width: '100%', marginTop: 12 }}>
-        <View style={styles.featureBox}>
-          <Text style={styles.featureTitle}>Relaxation Automation</Text>
-          <Text style={styles.featureDesc}>
+        <View style={[styles.featureBox, { borderColor: theme.borderColor }]}>
+          <Text style={[styles.featureTitle, { color: theme.textColor }]}>Relaxation Automation</Text>
+          <Text style={[styles.featureDesc, { color: theme.secondaryTextColor }]}>
             Enable app reminders and automation for your routines.
           </Text>
           <Pressable style={styles.primaryButton} onPress={() => Alert.alert('Automation', 'Automation enabled (demo).')}>
@@ -147,9 +149,9 @@ const [statsSummary, setStatsSummary] = useState<string | null>(null);
           </Pressable>
         </View>
 
-        <View style={styles.featureBox}>
-          <Text style={styles.featureTitle}>Analytics & Suggestions</Text>
-          <Text style={styles.featureDesc}>
+        <View style={[styles.featureBox, { borderColor: theme.borderColor }]}>
+          <Text style={[styles.featureTitle, { color: theme.textColor }]}>Analytics & Suggestions</Text>
+          <Text style={[styles.featureDesc, { color: theme.secondaryTextColor }]}>
             View your analytics and get personalized suggestions.
           </Text>
 
@@ -174,7 +176,6 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
     padding: 20,
     paddingTop: 40,
-    backgroundColor: '#fff',
     minHeight: '100%',
   },
   title: {
@@ -184,7 +185,6 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontSize: 16,
-    color: '#333',
     textAlign: 'center',
     marginBottom: 18,
   },
@@ -206,19 +206,18 @@ const styles = StyleSheet.create({
     backgroundColor: '#76c7c0',
   },
   progressPercent: { marginTop: 6, color: '#666' },
-  small: { marginTop: 8, color: '#555' },
+  small: { marginTop: 8 },
 
   featureBox: {
     marginTop: 16,
     padding: 14,
     borderWidth: 1,
-    borderColor: '#eee',
     borderRadius: 10,
     width: '100%',
     alignItems: 'center',
   },
   featureTitle: { fontSize: 16, fontWeight: '700', marginBottom: 6 },
-  featureDesc: { textAlign: 'center', color: '#666' },
+  featureDesc: { textAlign: 'center' },
 
   primaryButton: {
     marginTop: 12,

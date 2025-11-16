@@ -11,6 +11,7 @@ import {
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/RootNavigator';
 import { addRoutine, updateRoutine, Routine } from '../lib/storage/routines';
+import { useTheme } from '../lib/ThemeContext';
 
 
 type Props = NativeStackScreenProps<RootStackParamList, 'CreateRoutine'>;
@@ -19,6 +20,7 @@ const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'] as const;
 const SCENES = ['normal', 'dim', 'ambient'] as const;
 
 export default function CreateRoutineScreen({ route, navigation }: Props) {
+  const { theme } = useTheme();
   const existing: Routine | undefined = (route.params as any)?.routine;
 
   const [name, setName] = useState(existing?.name ?? '');
@@ -128,16 +130,17 @@ export default function CreateRoutineScreen({ route, navigation }: Props) {
 
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={{ padding: 16 }}>
-      <Text style={styles.label}>Routine name</Text>
+    <ScrollView style={[styles.container, { backgroundColor: theme.backgroundColor }]} contentContainerStyle={{ padding: 16 }}>
+      <Text style={[styles.label, { color: theme.textColor }]}>Routine name</Text>
       <TextInput
         value={name}
         onChangeText={setName}
-        style={styles.input}
+        style={[styles.input, { backgroundColor: theme.cardBackground, borderColor: theme.borderColor, color: theme.textColor }]}
         placeholder="Evening Wind Down"
+        placeholderTextColor={theme.secondaryTextColor}
       />
 
-      <Text style={styles.label}>Days</Text>
+      <Text style={[styles.label, { color: theme.textColor }]}>Days</Text>
       <View style={styles.daysRow}>
         {DAYS.map((d, i) => (
           <TouchableOpacity
@@ -157,24 +160,26 @@ export default function CreateRoutineScreen({ route, navigation }: Props) {
         ))}
       </View>
 
-      <Text style={styles.label}>Time (HH:MM)</Text>
+      <Text style={[styles.label, { color: theme.textColor }]}>Time (HH:MM)</Text>
       <TextInput
         value={time}
         onChangeText={setTime}
-        style={styles.input}
+        style={[styles.input, { backgroundColor: theme.cardBackground, borderColor: theme.borderColor, color: theme.textColor }]}
         placeholder="20:30"
+        placeholderTextColor={theme.secondaryTextColor}
       />
 
-      <Text style={styles.label}>Activities (one per line)</Text>
+      <Text style={[styles.label, { color: theme.textColor }]}>Activities (one per line)</Text>
       <TextInput
         value={itemsText}
         onChangeText={setItemsText}
-        style={[styles.input, { minHeight: 120 }]}
+        style={[styles.input, { minHeight: 120, backgroundColor: theme.cardBackground, borderColor: theme.borderColor, color: theme.textColor }]}
         placeholder={'Lighting candles\nDishes\n5 minute stretch'}
+        placeholderTextColor={theme.secondaryTextColor}
         multiline
       />
 
-      <Text style={styles.label}>Relaxation Scene (visual preview)</Text>
+      <Text style={[styles.label, { color: theme.textColor }]}>Relaxation Scene (visual preview)</Text>
       <View style={{ flexDirection: 'row', marginBottom: 12 }}>
         {SCENES.map((s) => (
           <TouchableOpacity
@@ -197,14 +202,12 @@ export default function CreateRoutineScreen({ route, navigation }: Props) {
 }
 
 const styles = StyleSheet.create({
-  container: { backgroundColor: '#fff' },
+  container: {},
   label: { fontWeight: '700', marginBottom: 6, marginTop: 12 },
   input: {
     borderWidth: 1,
-    borderColor: '#eee',
     padding: 10,
     borderRadius: 8,
-    backgroundColor: '#fafafa',
   },
   daysRow: { flexDirection: 'row', flexWrap: 'wrap' },
   dayBtn: {

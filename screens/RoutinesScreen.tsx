@@ -4,10 +4,12 @@ import { View, Text, StyleSheet, TouchableOpacity, FlatList, Alert } from 'react
 import { Routine, loadRoutines, removeRoutine } from '../lib/storage/routines';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/RootNavigator';
+import { useTheme } from '../lib/ThemeContext';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Routines'>;
 
 export default function RoutinesScreen({ navigation }: Props) {
+  const { theme } = useTheme();
   const [routines, setRoutines] = useState<Routine[]>([]);
 
   async function refresh() {
@@ -36,8 +38,8 @@ export default function RoutinesScreen({ navigation }: Props) {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>My Routines</Text>
+    <View style={[styles.container, { backgroundColor: theme.backgroundColor }]}>
+      <Text style={[styles.title, { color: theme.textColor }]}>My Routines</Text>
 
       <TouchableOpacity style={styles.addButton} onPress={() => navigation.navigate('CreateRoutine')}>
         <Text style={styles.addText}>+ Create Routine</Text>
@@ -47,12 +49,12 @@ export default function RoutinesScreen({ navigation }: Props) {
         data={routines}
         keyExtractor={(i) => i.id}
         renderItem={({ item }) => (
-          <View style={styles.card}>
-            <Text style={styles.routineName}>{item.name}</Text>
-            <Text style={styles.meta}>
+          <View style={[styles.card, { backgroundColor: theme.cardBackground }]}>
+            <Text style={[styles.routineName, { color: theme.textColor }]}>{item.name}</Text>
+            <Text style={[styles.meta, { color: theme.secondaryTextColor }]}>
               Days: {item.days.map((d) => ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][d]).join(', ')}
             </Text>
-            <Text style={styles.meta}>Time: {item.time ?? '—'}</Text>
+            <Text style={[styles.meta, { color: theme.secondaryTextColor }]}>Time: {item.time ?? '—'}</Text>
 
             <View style={styles.row}>
               <TouchableOpacity onPress={() => navigation.navigate('CreateRoutine', { routine: item })} style={styles.smallBtn}>
@@ -65,20 +67,20 @@ export default function RoutinesScreen({ navigation }: Props) {
             </View>
           </View>
         )}
-        ListEmptyComponent={<Text style={{ marginTop: 20, color: '#666'}}>No routines yet.</Text>}
+        ListEmptyComponent={<Text style={{ marginTop: 20, color: theme.secondaryTextColor }}>No routines yet.</Text>}
       />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex:1, padding: 16, backgroundColor: '#fff' },
+  container: { flex:1, padding: 16 },
   title: { fontSize: 22, fontWeight: '700', marginBottom: 12 },
   addButton: { backgroundColor: '#2f80ed', padding: 12, borderRadius: 8, alignItems:'center', marginBottom:12 },
   addText: { color: 'white', fontWeight: '600' },
-  card: { padding: 12, borderRadius: 8, backgroundColor: '#f7f7f7', marginBottom: 10 },
+  card: { padding: 12, borderRadius: 8, marginBottom: 10 },
   routineName: { fontSize: 16, fontWeight: '700' },
-  meta: { color: '#444', marginTop: 6 },
+  meta: { marginTop: 6 },
   row: { flexDirection:'row', justifyContent:'flex-end', marginTop:10 },
   smallBtn: { padding:8, borderRadius:6, backgroundColor:'#eee', marginLeft:8 },
   danger: { backgroundColor: '#e74c3c' }
