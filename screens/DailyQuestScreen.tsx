@@ -5,6 +5,8 @@ import CountdownTimer from '../components/CountdownTimer';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/RootNavigator';
 import { Image } from 'expo-image';
+import { loadStats, saveStats } from '../lib/storage/levels';
+
 
 
 type Props = NativeStackScreenProps<RootStackParamList, 'DailyQuest'>;
@@ -17,8 +19,26 @@ const TASKS = [
   'Declutter one small area',
 ];
 
+const QUEST_DURATION_SECONDS = 10; // set to 10 for testing, change back to 300 later
+
 const STREAK_KEY = 'streak';
 const LAST_COMPLETED_KEY = 'lastCompletedDate';
+
+// Update analytics stats when a daily quest is completed
+async function recordDailyQuestCompletion(durationSeconds: number) {
+  try {
+    const stats = await loadStats();
+    const minutes = Math.round(durationSeconds / 60); // e.g. 5 minutes per quest
+    // We treat the daily quest as a relaxation activity
+    const updated = {
+      ...stats,
+      totalRelaxMinutes: stats.totalRelaxMinutes + minutes,
+    };
+    await saveStats(updated);
+  } catch (e) {
+    console.warn('Failed to record daily quest in stats', e);
+  }
+}
 
 const DailyQuestScreen: React.FC<Props> = ({ navigation }) => {
   const [task, setTask] = useState<string>('');
@@ -92,6 +112,8 @@ const DailyQuestScreen: React.FC<Props> = ({ navigation }) => {
       await markCompletedToday();
       await incrementCompletedQuests();
 
+      await recordDailyQuestCompletion(QUEST_DURATION_SECONDS); 
+
       Animated.timing(fadeAnim, {
         toValue: 1,
         duration: 600,
@@ -136,8 +158,8 @@ const DailyQuestScreen: React.FC<Props> = ({ navigation }) => {
       {isRunning && (
         <>
           <CountdownTimer
-          /* Change back to 300 for a 5-minute timer - Mari */
-            duration={10}
+          // changed this to a constant so it will be easier to flip flop if needed
+            duration={QUEST_DURATION_SECONDS}
             onComplete={handleComplete}
             isRunning={isRunning}
           />

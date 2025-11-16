@@ -10,7 +10,7 @@ type Props = NativeStackScreenProps<RootStackParamList, 'Home'>;
 const HomeScreen: React.FC<Props> = ({ navigation }) => {
   return (
     <View style={styles.container}>
-      //add logo to display on home screen
+
       <Image 
         source={require('../assets/images/icon.png')}
         style={{ width: 120, height: 120, marginBottom: 20 }}
@@ -23,6 +23,21 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
       <CustomButton
         title="Daily Quest"
         onPress={() => navigation.navigate('DailyQuest')}
+      />
+
+      <CustomButton 
+        title="My Routines" 
+        onPress={() => navigation.navigate('Routines')} 
+      />
+      
+      <CustomButton 
+        title="Automation" 
+        onPress={() => navigation.navigate('Automation')} 
+      />
+
+      <CustomButton 
+        title="Analytics" 
+        onPress={() => navigation.navigate('Analytics')} 
       />
 
       <CustomButton

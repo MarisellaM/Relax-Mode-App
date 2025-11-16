@@ -96,6 +96,7 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: "row",
     justifyContent: "space-between",
+    marginTop: 10,
   },
   card: {
     backgroundColor: "#f3f4f6",
@@ -103,6 +104,11 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     alignItems: "center",
     marginBottom: 20,
+    shadowColor: '#000',
+    shadowOpacity: 0.03,
+    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 2,
   },
   cardSmall: {
     backgroundColor: "#f3f4f6",
@@ -111,6 +117,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
     width: "48%",
     marginBottom: 20,
+    shadowColor: '#000',
+    shadowOpacity: 0.03,
+    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 2,
   },
   cardLabel: { fontSize: 16, color: "#666" },
   cardValue: { fontSize: 32, fontWeight: "700", marginTop: 5 },

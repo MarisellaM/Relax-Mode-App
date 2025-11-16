@@ -5,6 +5,9 @@ import HomeScreen from '../screens/HomeScreen';
 import RelaxationScreen from '../screens/RelaxationScreen';
 import SettingsScreen from '../screens/SettingsScreen';
 import DailyQuestScreen from '../screens/DailyQuestScreen';
+import RoutinesScreen from '../screens/RoutinesScreen';
+import CreateRoutineScreen from '../screens/CreateRoutineScreen';
+import AutomationScreen from '../screens/AutomationScreen';
 import levels from '../screens/levels';
 import AnalyticsScreen from '../screens/AnalyticsScreen'
 
@@ -13,6 +16,9 @@ export type RootStackParamList = {
   Relaxation: undefined;
   Settings: undefined;
   DailyQuest: undefined;
+  Routines: undefined;
+  CreateRoutine: { routine?: any } | undefined;
+  Automation: undefined;
   Levels: undefined;
   Analytics: undefined;
 };
@@ -26,6 +32,9 @@ const RootNavigator = () => {
       <Stack.Screen name="Relaxation" component={RelaxationScreen} options={{ title: 'Relaxation' }} />
       <Stack.Screen name="Settings" component={SettingsScreen} options={{ title: 'Settings' }} />
       <Stack.Screen name="DailyQuest" component={DailyQuestScreen} options={{ title: 'Daily Quest' }}/>
+      <Stack.Screen name="Routines" component={RoutinesScreen} options={{ title: 'My Routines' }} />
+      <Stack.Screen name="CreateRoutine" component={CreateRoutineScreen} options={{ title: 'Create Routine' }} />
+      <Stack.Screen name="Automation" component={AutomationScreen} options={{ title: 'Automation' }} />
       <Stack.Screen name="Levels" component={levels} options={{ title: 'Achievements' }} />
       <Stack.Screen name="Analytics" component={AnalyticsScreen} />
       </Stack.Navigator>
