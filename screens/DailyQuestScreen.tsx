@@ -10,6 +10,7 @@ import { useTheme } from '../lib/ThemeContext';
 import { playSoundEffect } from '../lib/soundEffects';
 import { computeLevel } from './levels';
 import { testPlaySound } from '../lib/testSound';
+import { blue } from 'react-native-reanimated/lib/typescript/Colors';
 
 
 
@@ -166,11 +167,12 @@ const DailyQuestScreen: React.FC<Props> = ({ navigation }) => {
     <View style={[styles.container, { backgroundColor: theme.backgroundColor }]}>
       <Image
         source={require('../assets/images/DailyQuest.png')}
-        style={{ width: 500, height: 200, marginBottom: 20 }}
+        style={{ width: 500, height: 200, marginBottom: 1 }}
         contentFit="contain"
       />
-      <Text style={[styles.title, { color: theme.textColor }]}>Daily Quest</Text>
-      <Text style={[styles.task, { color: theme.textColor }]}>{task}</Text>
+      <Text style={[styles.title, {fontSize: 50, color:"#70AD8F" }]}>Daily Quest</Text>
+      <Text style={[styles.task, {fontWeight: 'bold', color: theme.textColor }]}>{task}</Text>
+      <Text style={[styles.streak, { color: theme.textColor }]}>🔥 Current Streak: {streak} day{streak === 1 ? '' : 's'}</Text>
 
       {!isRunning && !isComplete && (
         <>
@@ -182,13 +184,6 @@ const DailyQuestScreen: React.FC<Props> = ({ navigation }) => {
             setTask(TASKS[Math.floor(Math.random() * TASKS.length)]);
           }}>
             <Text style={[styles.buttonText, styles.textSecondary]}>New Task</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={[styles.button, styles.testButton]} onPress={() => {
-            console.log('Test button pressed');
-            testPlaySound();
-          }}>
-            <Text style={[styles.buttonText, styles.textSecondary]}>🔊 Test Sound</Text>
           </TouchableOpacity>
         </>
       )}
@@ -229,6 +224,9 @@ const DailyQuestScreen: React.FC<Props> = ({ navigation }) => {
           </TouchableOpacity>
         </Animated.View>
       )}
+
+       <Text style={[styles.streak, { color: theme.textColor,}]}> LEVEL </Text>
+       
     </View>
   );
 };

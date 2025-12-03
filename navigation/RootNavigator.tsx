@@ -7,7 +7,6 @@ import SettingsScreen from '../screens/SettingsScreen';
 import DailyQuestScreen from '../screens/DailyQuestScreen';
 import RoutinesScreen from '../screens/RoutinesScreen';
 import CreateRoutineScreen from '../screens/CreateRoutineScreen';
-import AutomationScreen from '../screens/AutomationScreen';
 import levels from '../screens/levels';
 import AnalyticsScreen from '../screens/AnalyticsScreen'
 import RoutineTrackerScreen from '../screens/routinesTracker';
@@ -36,7 +35,6 @@ const RootNavigator = () => {
       <Stack.Screen name="DailyQuest" component={DailyQuestScreen} options={{ title: 'Daily Quest' }}/>
       <Stack.Screen name="Routines" component={RoutinesScreen} options={{ title: 'My Routines' }} />
       <Stack.Screen name="CreateRoutine" component={CreateRoutineScreen} options={{ title: 'Create Routine' }} />
-      <Stack.Screen name="Automation" component={AutomationScreen} options={{ title: 'Automation' }} />
       <Stack.Screen name="Levels" component={levels} options={{ title: 'Achievements' }} />
       <Stack.Screen name="Analytics" component={AnalyticsScreen} />
       <Stack.Screen name="RoutineTracker" component={RoutineTrackerScreen} options={{ title: 'Routine Path' }} />

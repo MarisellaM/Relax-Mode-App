@@ -20,9 +20,8 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
         contentFit="contain"
       />
 
-      <Text style={[styles.title, { color: theme.textColor }]}> Welcome to Relax Mode </Text>
-      <Text style={[styles.subtitle, { color: theme.secondaryTextColor }]}>A simple base to our app.</Text>
-
+      <Text style={[styles.subtitle, { fontSize: 25, color: theme.textColor }]}> Welcome to </Text>
+      <Text style={[styles.title, { color: theme.textColor }]}> Relax Mode </Text>
       <CustomButton
         title="Daily Quest"
         onPress={() => navigation.navigate('DailyQuest')}
@@ -33,24 +32,10 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
         onPress={() => navigation.navigate('Routines')} 
       />
       
-      <CustomButton 
-        title="Automation" 
-        onPress={() => navigation.navigate('Automation')} 
-      />
-
-      <CustomButton 
-        title="Analytics" 
-        onPress={() => navigation.navigate('Analytics')} 
-      />
-
       <CustomButton
         title="Start Relaxation"
         onPress={() => navigation.navigate('Relaxation')}
       />
-    <CustomButton
-        title="Levels"
-        onPress={() => navigation.navigate('Levels')}
-      />  
 
       <CustomButton
         title="Settings"
