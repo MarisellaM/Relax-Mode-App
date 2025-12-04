@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Animated, Alert } from 'react-native';
+import {Text, StyleSheet, TouchableOpacity, Animated, Alert, ScrollView} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import CountdownTimer from '../components/CountdownTimer';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -10,8 +10,6 @@ import { useTheme } from '../lib/ThemeContext';
 import { playSoundEffect } from '../lib/soundEffects';
 import { computeLevel } from './levels';
 import { testPlaySound } from '../lib/testSound';
-import { blue } from 'react-native-reanimated/lib/typescript/Colors';
-
 
 
 type Props = NativeStackScreenProps<RootStackParamList, 'DailyQuest'>;
@@ -164,7 +162,7 @@ const DailyQuestScreen: React.FC<Props> = ({ navigation }) => {
   };
 
   return (
-    <View style={[styles.container, { backgroundColor: theme.backgroundColor }]}>
+    <ScrollView style={{flex:1, backgroundColor: theme.backgroundColor }} contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
       <Image
         source={require('../assets/images/DailyQuest.png')}
         style={{ width: 500, height: 200, marginBottom: 1 }}
@@ -172,7 +170,6 @@ const DailyQuestScreen: React.FC<Props> = ({ navigation }) => {
       />
       <Text style={[styles.title, {fontSize: 50, color:"#70AD8F" }]}>Daily Quest</Text>
       <Text style={[styles.task, {fontWeight: 'bold', color: theme.textColor }]}>{task}</Text>
-      <Text style={[styles.streak, { color: theme.textColor }]}>🔥 Current Streak: {streak} day{streak === 1 ? '' : 's'}</Text>
 
       {!isRunning && !isComplete && (
         <>
@@ -219,15 +216,73 @@ const DailyQuestScreen: React.FC<Props> = ({ navigation }) => {
             <Text style={[styles.buttonText, styles.textSecondary]}>Do Another</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={[styles.button]} onPress={() => navigation.goBack()}>
-            <Text style={styles.buttonText}>Back to Home</Text>
-          </TouchableOpacity>
         </Animated.View>
       )}
 
-       <Text style={[styles.streak, { color: theme.textColor,}]}> LEVEL </Text>
-       
-    </View>
+      {(() => {
+        const LevelBar: React.FC = () => {
+          const [completed, setCompleted] = useState<number | null>(null);
+
+          useEffect(() => {
+            let mounted = true;
+            (async () => {
+              try {
+                const count = await LoadDailyQuestData();
+                if (mounted) setCompleted(count);
+              } catch (e) {
+                console.warn('Failed to load level data', e);
+              }
+            })();
+            return () => {
+              mounted = false;
+            };
+          }, []);
+
+          if (completed === null) return null;
+
+          const lvlObj: any = computeLevel(completed);
+          const levelNum: number = typeof lvlObj === 'number' ? lvlObj : (lvlObj.level ?? 0);
+          const progress: number =
+            typeof lvlObj === 'object' && typeof lvlObj.progress === 'number'
+              ? Math.max(0, Math.min(1, lvlObj.progress))
+              : ((completed % 5) / 5);
+
+          const pct = Math.round(progress * 100);
+
+          return (
+            <Animated.View style={{ width: 400, alignItems: 'center', marginTop: 20 }}>
+              <Text style={[styles.streak, { fontWeight: '700', color: theme.textColor }]}> Level {levelNum}</Text>
+
+              <Animated.View
+                style={{
+                  width: '90%',
+                  height: 30,
+                  backgroundColor: '#e6e6e6',
+                  borderRadius: 15,
+                  overflow: 'hidden',
+                  marginVertical: 8,
+                }}
+              >
+                <Animated.View
+                  style={{
+                    width: `${pct}%`,
+                    height: '100%',
+                    backgroundColor: '#70AD8F',
+                  }}
+                />
+              </Animated.View>
+
+              <Text style={[styles.streak, { color: theme.textColor }]}>
+                {pct}% to next level 
+              </Text>
+            </Animated.View>
+          );
+        };
+
+        return <LevelBar />;
+      })()}
+
+    </ScrollView>
   );
 };
 
@@ -256,6 +311,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
+    flexGrow: 1,
   },
   title: {
     fontSize: 26,
@@ -295,7 +351,7 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: '700',
     marginBottom: 10,
-    color: '#27ae60',
+    color: '#70AD8F',
   },
   streak: {
     fontSize: 16,
