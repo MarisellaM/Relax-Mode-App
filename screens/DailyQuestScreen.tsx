@@ -7,7 +7,6 @@ import { RootStackParamList } from '../navigation/RootNavigator';
 import { Image } from 'expo-image';
 import { loadStats, saveStats } from '../lib/storage/levels';
 import { useTheme } from '../lib/ThemeContext';
-import { playSoundEffect } from '../lib/soundEffects';
 import { computeLevel } from './levels';
 import { testPlaySound } from '../lib/testSound';
 
@@ -21,6 +20,7 @@ const TASKS = [
   'Drink a glass of water slowly',
   'Declutter one small area',
 ];
+
 
 const QUEST_DURATION_SECONDS = 10; // set to 10 for testing, change back to 300 later
 
@@ -183,6 +183,7 @@ const DailyQuestScreen: React.FC<Props> = ({ navigation }) => {
             <Text style={[styles.buttonText, styles.textSecondary]}>New Task</Text>
           </TouchableOpacity>
         </>
+
       )}
 
       {isRunning && (
@@ -193,7 +194,6 @@ const DailyQuestScreen: React.FC<Props> = ({ navigation }) => {
             onComplete={handleComplete}
             isRunning={isRunning}
           />
-
           <TouchableOpacity style={[styles.button, styles.secondary]} onPress={() => { setIsRunning(false); }}>
             <Text style={[styles.buttonText, styles.textSecondary]}>Cancel</Text>
           </TouchableOpacity>
@@ -208,7 +208,6 @@ const DailyQuestScreen: React.FC<Props> = ({ navigation }) => {
             style={{ width: 150, height: 150, marginBottom: 10 }}
             contentFit="contain"
           />
-
           <Text style={styles.congrats}>🌞 Well done!</Text>
           <Text style={[styles.streak, { color: theme.textColor }]}>✨ Current Streak: {streak} day{streak === 1 ? '' : 's'}</Text>
 
@@ -218,7 +217,8 @@ const DailyQuestScreen: React.FC<Props> = ({ navigation }) => {
 
         </Animated.View>
       )}
-
+      
+  
       {(() => {
         const LevelBar: React.FC = () => {
           const [completed, setCompleted] = useState<number | null>(null);
@@ -240,14 +240,8 @@ const DailyQuestScreen: React.FC<Props> = ({ navigation }) => {
 
           if (completed === null) return null;
 
-          const lvlObj: any = computeLevel(completed);
-          const levelNum: number = typeof lvlObj === 'number' ? lvlObj : (lvlObj.level ?? 0);
-          const progress: number =
-            typeof lvlObj === 'object' && typeof lvlObj.progress === 'number'
-              ? Math.max(0, Math.min(1, lvlObj.progress))
-              : ((completed % 5) / 5);
-
-          const pct = Math.round(progress * 100);
+          const { level: levelNum, progress } = computeLevel(completed);
+          const pct = Math.max(0, Math.min(100,progress));
 
           return (
             <Animated.View style={{ width: 400, alignItems: 'center', marginTop: 20 }}>
@@ -341,9 +335,7 @@ const styles = StyleSheet.create({
   secondary: {
     backgroundColor: '#efefef',
   },
-  testButton: {
-    backgroundColor: '#f39c12',
-  },
+
   textSecondary: {
     color: '#333',
   },

@@ -8,7 +8,7 @@ let audioInitialized = false;
 
 // Keep track of currently playing sound and timeout
 let currentSound: Audio.Sound | null = null;
-let currentFadeTimeout: NodeJS.Timeout | null = null;
+let currentFadeTimeout: ReturnType<typeof setTimeout> | null = null;
 
 async function initializeAudio() {
   if (audioInitialized) return;

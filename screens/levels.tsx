@@ -1,8 +1,3 @@
-/*Create levels screen*/
-/*  The user enables "Relaxation Automation" so the app can automatically remind them of cleaning/relaxation through notifications
-  They can view their analytics to see time spent relaxing and time spent cleaning
-  App can provide suggestions based on habits such as "You've cleaned 5 days straight, time to rest for a day."
-*/
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Pressable, Alert, ScrollView } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -71,9 +66,6 @@ const LevelsScreen: React.FC<Props> = ({ navigation }) => {
   const [completed, setCompleted] = useState<number>(0);
   const { level, progress } = computeLevel(completed);
 
-
-
-
   useEffect(() => {
     (async () => {
       try {
@@ -86,17 +78,6 @@ const LevelsScreen: React.FC<Props> = ({ navigation }) => {
     })();
   }, []);
 
-
-
-  const openAnalytics = () => {
-    // Ensure 'Analytics' route exists in RootNavigator
-    navigation.navigate('Analytics' as keyof RootStackParamList);
-  };
-
-  const goToAutomation = () => {
-    // Navigate to the Automation screen instead of just showing an alert
-    navigation.navigate('Automation');
-  };
 
   const provideSuggestions = () => {
     const s = suggestionFromCompleted(completed);
@@ -122,17 +103,6 @@ const LevelsScreen: React.FC<Props> = ({ navigation }) => {
 
 
 
-      <View style={{ width: '100%', marginTop: 12 }}>
-        <View style={[styles.featureBox, { borderColor: theme.borderColor }]}>
-          <Text style={[styles.featureTitle, { color: theme.textColor }]}>Relaxation Automation</Text>
-          <Text style={[styles.featureDesc, { color: theme.secondaryTextColor }]}>
-            Enable app reminders and automation for your routines.
-          </Text>
-          <Pressable style={styles.primaryButton} onPress={() => Alert.alert('Automation', 'Automation enabled (demo).')}>
-            <Text style={styles.primaryButtonText}>Enable Automation</Text>
-          </Pressable>
-        </View>
-
         <View style={[styles.featureBox, { borderColor: theme.borderColor }]}>
           <Text style={[styles.featureTitle, { color: theme.textColor }]}>Analytics & Suggestions</Text>
           <Text style={[styles.featureDesc, { color: theme.secondaryTextColor }]}>
@@ -140,16 +110,12 @@ const LevelsScreen: React.FC<Props> = ({ navigation }) => {
           </Text>
 
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 10 }}>
-            <Pressable style={styles.secondaryButton} onPress={openAnalytics}>
-              <Text style={styles.secondaryButtonText}>View Analytics</Text>
-            </Pressable>
 
             <Pressable style={styles.secondaryButton} onPress={provideSuggestions}>
               <Text style={styles.secondaryButtonText}>Get Suggestion</Text>
             </Pressable>
           </View>
         </View>
-      </View>
     </ScrollView>
   );
 };
