@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import React, {useRef, useEffect} from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Animated } from 'react-native';
 import CustomButton from '../components/CustomButton';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/RootNavigator';
@@ -8,8 +8,45 @@ import { useTheme } from '../lib/ThemeContext';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Home'>;
 
+
 const HomeScreen: React.FC<Props> = ({ navigation }) => {
   const { theme } = useTheme();
+
+// Making things glow 
+const glowAnim = useRef(new Animated.Value(0.8)).current;
+const pressAnim = useRef(new Animated.Value(1)).current;
+
+useEffect(() => {
+  Animated.loop(
+    Animated.sequence([
+      Animated.timing(glowAnim, {
+        toValue: 1.15,
+        duration: 1400,
+        useNativeDriver: true,  
+      }),
+      Animated.timing(glowAnim, {
+        toValue: 1,
+        duration: 1400,
+        useNativeDriver: true,
+      }),
+    ])
+  ).start();
+},[]);
+
+
+const handlePressIn = () => {
+  Animated.timing(pressAnim, {
+    toValue: 0.92,
+    duration: 120,
+    useNativeDriver: true,
+  }).start(() => {
+    Animated.timing(pressAnim, {
+      toValue: 1,
+      duration: 120,
+      useNativeDriver: true,
+    }).start();
+  });
+};
 
   return (
     <View style={[styles.container, { backgroundColor: theme.backgroundColor }]}>
@@ -20,12 +57,20 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
         contentFit="contain"
       />
 
-      <Text style={[styles.subtitle, { fontSize: 25, color: theme.textColor }]}> Welcome to </Text>
-      <Text style={[styles.title, { color: theme.textColor }]}> Relax Mode </Text>
-      <CustomButton
-        title="Daily Quest"
-        onPress={() => navigation.navigate('DailyQuest')}
-      />
+ 
+      <Text style={[styles.subtitle, { fontSize: 25, color: theme.textColor }]}>Welcome to</Text>
+      <Text style={[styles.title, { color: theme.textColor }]}>Relax Mode</Text>
+
+
+      <Animated.View style={{ transform: [{ scale: pressAnim }] }}>
+        <TouchableOpacity onPressIn={handlePressIn} onPress={() => navigation.navigate('DailyQuest')}>
+          <Image
+            source={require('../assets/images/Levels.png')}
+            style={{ width: 260, height: 140 }}
+            contentFit="contain"
+          />
+        </TouchableOpacity>
+      </Animated.View>
 
       <CustomButton 
         title="My Routines" 
