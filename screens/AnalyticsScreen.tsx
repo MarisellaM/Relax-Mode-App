@@ -6,7 +6,7 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useTheme } from '../lib/ThemeContext';
 import { loadStats } from '../lib/storage/levels';
 
-type Props = NativeStackScreenProps<RootStackParamList, 'Analytics'>;
+type Props = NativeStackScreenProps<RootStackParamList, 'AnalyticsScreen'>;
 
 type LogEntry = {
   id: string;

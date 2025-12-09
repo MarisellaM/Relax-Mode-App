@@ -187,7 +187,7 @@ const DailyQuestScreen: React.FC<Props> = ({ navigation }) => {
 
       {isComplete && (
         <Animated.View style={{ opacity: fadeAnim, alignItems: 'center' }}>
-          <Image source={require('../assets/images/congrats.gif')} style={{ width: 150, height: 150 }} />
+          <Image source={require('../assets/images/congrats.gif')} style={{ width: 250, height: 130 }} />
           <Text style={styles.congrats}>🌞 Well done!</Text>
           <Text style={[styles.streak, { color: theme.textColor }]}>✨ Current Streak: {streak} days</Text>
 
@@ -211,6 +211,10 @@ const DailyQuestScreen: React.FC<Props> = ({ navigation }) => {
         <Text style={[styles.featureDesc, { color: theme.secondaryTextColor }]}>
           View your analytics and get personalized suggestions.
         </Text>
+
+        <Pressable style={styles.secondaryButton} onPress={() => navigation.navigate('Analytics')}>
+          <Text style={styles.secondaryButtonText}>View Analytics</Text>
+        </Pressable>
 
         <Pressable style={styles.secondaryButton} onPress={provideSuggestions}>
           <Text style={styles.secondaryButtonText}>Get Suggestion</Text>

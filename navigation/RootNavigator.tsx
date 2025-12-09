@@ -21,6 +21,7 @@ export type RootStackParamList = {
   Automation: undefined;
   Levels: undefined;
   RoutineTracker: { routineId: string };
+  Analytics: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -36,6 +37,7 @@ const RootNavigator = () => {
       <Stack.Screen name="CreateRoutine" component={CreateRoutineScreen} options={{ title: 'Create Routine' }} />
       <Stack.Screen name="Levels" component={levels} options={{ title: 'Achievements' }} />
       <Stack.Screen name="RoutineTracker" component={RoutineTrackerScreen} options={{ title: 'Routine Path' }} />
+      <Stack.Screen name="Analytics" component={AnalyticsScreen} options={{ title: 'Analytics' }} />
       </Stack.Navigator>
   );
 };
