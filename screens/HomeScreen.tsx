@@ -59,34 +59,56 @@ const handlePressIn = () => {
 
  
       <Text style={[styles.subtitle, { fontSize: 25, color: theme.textColor }]}>Welcome to</Text>
-      <Text style={[styles.title, { color: theme.textColor }]}>Relax Mode</Text>
-
-
+      
+      <Image 
+        source={require('../assets/images/AppName.png')}
+        style={{ width: 300, height: 80, marginBottom: 12, marginTop: -30 }}
+        contentFit="contain"
+      />
+  <View style={styles.row}>
       <Animated.View style={{ transform: [{ scale: pressAnim }] }}>
         <TouchableOpacity onPressIn={handlePressIn} onPress={() => navigation.navigate('DailyQuest')}>
           <Image
             source={require('../assets/images/Levels.png')}
-            style={{ width: 260, height: 140 }}
+            style={{ width: 160, height: 140 }}
             contentFit="contain"
           />
         </TouchableOpacity>
       </Animated.View>
 
-      <CustomButton 
-        title="My Routines" 
-        onPress={() => navigation.navigate('Routines')} 
-      />
-      
-      <CustomButton
-        title="Start Relaxation"
-        onPress={() => navigation.navigate('Relaxation')}
-      />
+      <Animated.View style={{ transform: [{ scale: pressAnim }] }}>
+        <TouchableOpacity onPressIn={handlePressIn} onPress={() => navigation.navigate('Relaxation')}>
+          <Image
+            source={require('../assets/images/Relax.png')}
+            style={{ width: 260, height: 140 }}
+            contentFit="contain"
+          />
+        </TouchableOpacity>
+      </Animated.View>
+  </View>
 
-      <CustomButton
-        title="Settings"
-        onPress={() => navigation.navigate('Settings')}
-        secondary
-      />
+  <View style={styles.row}>
+      <Animated.View style={{ transform: [{ scale: pressAnim }] }}>
+        <TouchableOpacity onPressIn={handlePressIn} onPress={() => navigation.navigate('Routines')}>
+          <Image
+            source={require('../assets/images/Rout.png')}
+            style={{ width: 160, height: 140 }}
+            contentFit="contain"
+          />
+        </TouchableOpacity>
+      </Animated.View>
+
+      <Animated.View style={{ transform: [{ scale: pressAnim }] }}>
+        <TouchableOpacity onPressIn={handlePressIn} onPress={() => navigation.navigate('Settings')}>
+          <Image
+            source={require('../assets/images/Settings.png')}
+            style={{ width: 260, height: 140 }}
+            contentFit="contain"
+          />
+        </TouchableOpacity>
+      </Animated.View>
+  </View>
+
     </View>
   );
 };
@@ -107,6 +129,18 @@ const styles = StyleSheet.create({
     fontSize: 14,
     marginBottom: 24,
     textAlign: 'center',
+  },
+  row: {
+  flexDirection: 'row',
+  justifyContent: 'flex-start',
+  alignItems: 'center',
+  width: '90%',
+  marginVertical: 30,
+  },
+
+  icon: {
+    width: 160,
+    height: 120,
   },
 });
 
