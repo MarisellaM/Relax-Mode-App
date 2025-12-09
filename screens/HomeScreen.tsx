@@ -114,34 +114,11 @@ const handlePressIn = () => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 20,
-  },
-  title: {
-    fontSize: 26,
-    fontWeight: '700',
-    marginBottom: 8,
-  },
-  subtitle: {
-    fontSize: 14,
-    marginBottom: 24,
-    textAlign: 'center',
-  },
-  row: {
-  flexDirection: 'row',
-  justifyContent: 'flex-start',
-  alignItems: 'center',
-  width: '90%',
-  marginVertical: 30,
-  },
-
-  icon: {
-    width: 160,
-    height: 120,
-  },
+  container: { flex: 1,alignItems: 'center', justifyContent: 'center', padding: 20,},
+  title: {fontSize: 26, fontWeight: '700',marginBottom: 8,},
+  subtitle: {fontSize: 14,marginBottom: 24,textAlign: 'center',},
+  row: {flexDirection: 'row',justifyContent: 'flex-start',alignItems: 'center', width: '90%', marginVertical: 30,},
+  icon: {width: 160, height: 120,},
 });
 
 export default HomeScreen; 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import {Text, StyleSheet, TouchableOpacity, Animated, Alert, ScrollView} from 'react-native';
+import {Text, StyleSheet, TouchableOpacity, Animated, Alert, ScrollView, View, Pressable} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import CountdownTimer from '../components/CountdownTimer';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -7,151 +7,142 @@ import { RootStackParamList } from '../navigation/RootNavigator';
 import { Image } from 'expo-image';
 import { loadStats, saveStats } from '../lib/storage/levels';
 import { useTheme } from '../lib/ThemeContext';
-import { computeLevel } from './levels';
 import { testPlaySound } from '../lib/testSound';
 
-
+type LevelNumber = number;
+type ProgressNumber = number;
 type Props = NativeStackScreenProps<RootStackParamList, 'DailyQuest'>;
 
+type LevelBarProps = {
+  level: LevelNumber;
+  progress: ProgressNumber;
+};
+
+// compute level and progress percent
+export function computeLevel(completed: number): { level: LevelNumber; progress: ProgressNumber } {
+  if (completed <= 2) {
+    const pct = (completed / 3) * 100;
+    return { level: 1, progress: Math.round(pct) };
+  }
+  if (completed <= 6) {
+    const pct = ((completed - 3) / 4) * 100;
+    return { level: 2, progress: Math.round(pct) };
+  }
+  if (completed <= 10) {
+    const pct = ((completed - 7) / 4) * 100;
+    return { level: 3, progress: Math.round(pct) };
+  }
+  const capped = Math.min(completed, 15);
+  const pct = ((capped - 11) / 5) * 100;
+  return { level: 4, progress: Math.round(pct) };
+}
+
+function suggestionFromCompleted(completed: number) {
+  if (completed >= 10) return "Amazing consistency — consider a restful reward this week!";
+  if (completed >= 5) return "Great progress — keep it up and try a small challenge!";
+  if (completed === 0) return "Start small — try one 5-minute quest today.";
+  return "Nice! Keep building the habit — try 2 days in a row next.";
+}
+
+const COMPLETED_KEY = 'completedQuests';
+
 const TASKS = [
-  'Take 5 minutes to breathe and stretch',
   'Tidy up your workspace',
   'Step outside for fresh air',
   'Drink a glass of water slowly',
   'Declutter one small area',
 ];
 
-
-const QUEST_DURATION_SECONDS = 10; // set to 10 for testing, change back to 300 later
-
+const QUEST_DURATION_SECONDS = 10;
 const STREAK_KEY = 'streak';
 const LAST_COMPLETED_KEY = 'lastCompletedDate';
 
-// Update analytics stats when a daily quest is completed
 async function recordDailyQuestCompletion(durationSeconds: number) {
   try {
     const stats = await loadStats();
-    const minutes = Math.round(durationSeconds / 60); // e.g. 5 minutes per quest
-    // We treat the daily quest as a relaxation activity
+    const minutes = Math.round(durationSeconds / 60);
     const updated = {
       ...stats,
       totalRelaxMinutes: stats.totalRelaxMinutes + minutes,
     };
     await saveStats(updated);
-  } catch (e) {
-    console.warn('Failed to record daily quest in stats', e);
-  }
+  } catch {}
 }
 
 const DailyQuestScreen: React.FC<Props> = ({ navigation }) => {
+
   const { theme } = useTheme();
-  const [task, setTask] = useState<string>('');
+
+
+  const [completed, setCompleted] = useState(0);
+  const { level, progress } = computeLevel(completed);
+
+  useEffect(() => {
+    (async () => {
+      const raw = await AsyncStorage.getItem(COMPLETED_KEY);
+      setCompleted(raw ? JSON.parse(raw) : 0);
+    })();
+  }, []);
+
+  const provideSuggestions = () => {
+    Alert.alert("Suggestion", suggestionFromCompleted(completed));
+  };
+
+
+  const [task, setTask] = useState('');
   const [isRunning, setIsRunning] = useState(false);
   const [isComplete, setIsComplete] = useState(false);
-  const [streak, setStreak] = useState<number>(0);
+  const [streak, setStreak] = useState(0);
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    const randomTask = TASKS[Math.floor(Math.random() * TASKS.length)];
-    setTask(randomTask);
+    setTask(TASKS[Math.floor(Math.random() * TASKS.length)]);
     loadStreak();
   }, []);
 
   const loadStreak = async () => {
-    try {
-      const stored = await AsyncStorage.getItem(STREAK_KEY);
-      if (stored) setStreak(Number(stored));
-    } catch (e) {
-      console.warn('Failed to load streak', e);
-    }
+    const stored = await AsyncStorage.getItem(STREAK_KEY);
+    if (stored) setStreak(Number(stored));
   };
 
   const saveStreak = async (value: number) => {
-    try {
-      setStreak(value);
-      await AsyncStorage.setItem(STREAK_KEY, value.toString());
-    } catch (e) {
-      console.warn('Failed to save streak', e);
-    }
+    setStreak(value);
+    await AsyncStorage.setItem(STREAK_KEY, value.toString());
   };
 
   const markCompletedToday = async () => {
-    try {
-      const today = new Date().toISOString().split('T')[0]; /* YYYY-MM-DD */
-      await AsyncStorage.setItem(LAST_COMPLETED_KEY, today);
-    } catch (e) {
-      console.warn('Failed to save last completed date', e);
-    }
+    const today = new Date().toISOString().split('T')[0];
+    await AsyncStorage.setItem(LAST_COMPLETED_KEY, today);
   };
 
   const handleComplete = async () => {
     setIsComplete(true);
     setIsRunning(false);
 
-    /* Basic streak logic */
-    try {
-      const last = await AsyncStorage.getItem(LAST_COMPLETED_KEY);
-      const today = new Date();
-      const todayStr = today.toISOString().split('T')[0];
+    const last = await AsyncStorage.getItem(LAST_COMPLETED_KEY);
+    const today = new Date().toISOString().split('T')[0];
 
-      let newStreak = streak;
-      if (!last) {
-        newStreak = streak + 1;
-      } else if (last === todayStr) {
-        /* already completed today - no increment */
-        Alert.alert('Already counted', 'You already completed a quest today.');
-      } else {
-        /* check if last was yesterday */
-        const lastDate = new Date(last);
-        const diffDays = Math.floor((today.getTime() - lastDate.getTime()) / (1000 * 60 * 60 * 24));
-        if (diffDays === 1) {
-          newStreak = streak + 1;
-        } else {
-          /*  broke streak; reset to 1 (today) */
-          newStreak = 1;
-        }
-      }
-
-      await saveStreak(newStreak);
-      await markCompletedToday();
-
-      // Check for level up
-      const beforeCount = await LoadDailyQuestData();
-      const levelBefore = computeLevel(beforeCount);
-
-      await incrementCompletedQuests();
-
-      const afterCount = beforeCount + 1;
-      const levelAfter = computeLevel(afterCount);
-
-      await recordDailyQuestCompletion(QUEST_DURATION_SECONDS);
-
-      // Play completion sound (or special level up sound)
-      console.log('[DailyQuest] About to play completion sound...');
-      if (levelAfter.level > levelBefore.level) {
-        // Level up! Play sound and show alert
-        console.log('[DailyQuest] Level up detected! Playing sound...');
-        await testPlaySound();
-        Alert.alert(
-          '🎉 Level Up!',
-          `Congratulations! You've reached Level ${levelAfter.level}!`,
-          [{ text: 'Awesome!', style: 'default' }]
-        );
-      } else {
-        // Regular completion sound
-        console.log('[DailyQuest] Regular completion, playing sound...');
-        await testPlaySound();
-      }
-      console.log('[DailyQuest] Sound should have played');
-
-      Animated.timing(fadeAnim, {
-        toValue: 1,
-        duration: 600,
-        useNativeDriver: true,
-      }).start();
-    } catch (e) {
-      console.warn('Error completing quest', e);
+    let newStreak = streak;
+    if (!last) newStreak = streak + 1;
+    else if (last === today) Alert.alert("Already counted", "You already completed a quest today.");
+    else {
+      const diff = Math.floor((Date.now() - new Date(last).getTime()) / 86400000);
+      newStreak = diff === 1 ? streak + 1 : 1;
     }
+
+    await saveStreak(newStreak);
+    await markCompletedToday();
+
+    await incrementCompletedQuests();
+    setCompleted(prev => prev + 1);
+
+    await recordDailyQuestCompletion(QUEST_DURATION_SECONDS);
+
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 600,
+      useNativeDriver: true,
+    }).start();
   };
 
   const handleReset = () => {
@@ -162,14 +153,16 @@ const DailyQuestScreen: React.FC<Props> = ({ navigation }) => {
   };
 
   return (
-    <ScrollView style={{flex:1, backgroundColor: theme.backgroundColor }} contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
-      <Image
-        source={require('../assets/images/DailyQuest.png')}
-        style={{ width: 500, height: 200, marginBottom: 1 }}
-        contentFit="contain"
-      />
-      <Text style={[styles.title, {fontSize: 50, color:"#70AD8F" }]}>Daily Quest</Text>
-      <Text style={[styles.task, {fontWeight: 'bold', color: theme.textColor }]}>{task}</Text>
+    <ScrollView 
+      style={{flex:1, backgroundColor: theme.backgroundColor}}
+      contentContainerStyle={styles.container}
+      showsVerticalScrollIndicator={true}
+    >
+
+      <Image source={require('../assets/images/DailyQuest.png')} style={{ width: 500, height: 100 }} />
+
+      <Text style={[styles.title, { fontSize: 50, color: "#70AD8F" }]}>Daily Quest</Text>
+      <Text style={[styles.task, { color: theme.textColor }]}>{task}</Text>
 
       {!isRunning && !isComplete && (
         <>
@@ -177,24 +170,16 @@ const DailyQuestScreen: React.FC<Props> = ({ navigation }) => {
             <Text style={styles.buttonText}>Start 5-Minute Timer</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={[styles.button, styles.secondary]} onPress={() => {
-            setTask(TASKS[Math.floor(Math.random() * TASKS.length)]);
-          }}>
+          <TouchableOpacity style={[styles.button, styles.secondary]} onPress={() => setTask(TASKS[Math.floor(Math.random()*TASKS.length)])}>
             <Text style={[styles.buttonText, styles.textSecondary]}>New Task</Text>
           </TouchableOpacity>
         </>
-
       )}
 
       {isRunning && (
         <>
-          <CountdownTimer
-          // changed this to a constant so it will be easier to flip flop if needed
-            duration={QUEST_DURATION_SECONDS}
-            onComplete={handleComplete}
-            isRunning={isRunning}
-          />
-          <TouchableOpacity style={[styles.button, styles.secondary]} onPress={() => { setIsRunning(false); }}>
+          <CountdownTimer duration={QUEST_DURATION_SECONDS} onComplete={handleComplete} isRunning={isRunning} />
+          <TouchableOpacity style={[styles.button, styles.secondary]} onPress={() => setIsRunning(false)}>
             <Text style={[styles.buttonText, styles.textSecondary]}>Cancel</Text>
           </TouchableOpacity>
         </>
@@ -202,153 +187,83 @@ const DailyQuestScreen: React.FC<Props> = ({ navigation }) => {
 
       {isComplete && (
         <Animated.View style={{ opacity: fadeAnim, alignItems: 'center' }}>
-          
-          <Image
-           source={require('../assets/images/congrats.gif')}
-            style={{ width: 150, height: 150, marginBottom: 10 }}
-            contentFit="contain"
-          />
+          <Image source={require('../assets/images/congrats.gif')} style={{ width: 150, height: 150 }} />
           <Text style={styles.congrats}>🌞 Well done!</Text>
-          <Text style={[styles.streak, { color: theme.textColor }]}>✨ Current Streak: {streak} day{streak === 1 ? '' : 's'}</Text>
+          <Text style={[styles.streak, { color: theme.textColor }]}>✨ Current Streak: {streak} days</Text>
 
           <TouchableOpacity style={[styles.button, styles.secondary]} onPress={handleReset}>
             <Text style={[styles.buttonText, styles.textSecondary]}>Do Another</Text>
           </TouchableOpacity>
-
         </Animated.View>
       )}
-      
-  
-      {(() => {
-        const LevelBar: React.FC = () => {
-          const [completed, setCompleted] = useState<number | null>(null);
 
-          useEffect(() => {
-            let mounted = true;
-            (async () => {
-              try {
-                const count = await LoadDailyQuestData();
-                if (mounted) setCompleted(count);
-              } catch (e) {
-                console.warn('Failed to load level data', e);
-              }
-            })();
-            return () => {
-              mounted = false;
-            };
-          }, []);
+      <Image source={require('../assets/images/achievement.png')} style={{ width: 180, height: 180 }} />
+      <Text style={[styles.title, { color: theme.textColor }]}>Achievements</Text>
 
-          if (completed === null) return null;
+      <LevelBar level={level} progress={progress} />
 
-          const { level: levelNum, progress } = computeLevel(completed);
-          const pct = Math.max(0, Math.min(100,progress));
+      <Text style={[styles.small, { color: theme.secondaryTextColor }]}>
+        Completed quests: <Text style={{ fontWeight: "700", color: theme.textColor }}>{completed}</Text>
+      </Text>
 
-          return (
-            <Animated.View style={{ width: 400, alignItems: 'center', marginTop: 20 }}>
-              <Text style={[styles.streak, { fontWeight: '700', color: theme.textColor }]}> Level {levelNum}</Text>
+      <View style={[styles.featureBox, { borderColor: theme.borderColor }]}>
+        <Text style={[styles.featureTitle, { color: theme.textColor }]}>Analytics & Suggestions</Text>
+        <Text style={[styles.featureDesc, { color: theme.secondaryTextColor }]}>
+          View your analytics and get personalized suggestions.
+        </Text>
 
-              <Animated.View
-                style={{
-                  width: '90%',
-                  height: 30,
-                  backgroundColor: '#e6e6e6',
-                  borderRadius: 15,
-                  overflow: 'hidden',
-                  marginVertical: 8,
-                }}
-              >
-                <Animated.View
-                  style={{
-                    width: `${pct}%`,
-                    height: '100%',
-                    backgroundColor: '#70AD8F',
-                  }}
-                />
-              </Animated.View>
-
-              <Text style={[styles.streak, { color: theme.textColor }]}>
-                {pct}% to next level 
-              </Text>
-            </Animated.View>
-          );
-        };
-
-        return <LevelBar />;
-      })()}
+        <Pressable style={styles.secondaryButton} onPress={provideSuggestions}>
+          <Text style={styles.secondaryButtonText}>Get Suggestion</Text>
+        </Pressable>
+      </View>
 
     </ScrollView>
   );
 };
 
-/* Store the number of completed daily quests to update levels screen*/
-const LoadDailyQuestData = async () => {
-  try {
-    const completedQuests = await AsyncStorage.getItem('completedQuests');
-    return completedQuests ? JSON.parse(completedQuests) : 0;
-  } catch (e) {
-    console.warn('Failed to load completed quests', e);
-    return 0;
-  }
-};
-
 async function incrementCompletedQuests(): Promise<number> {
-  const raw = await AsyncStorage.getItem('completedQuests');
-  const current = raw ? JSON.parse(raw) as number : 0;
+  const raw = await AsyncStorage.getItem(COMPLETED_KEY);
+  const current = raw ? JSON.parse(raw) : 0;
   const next = current + 1;
-  await AsyncStorage.setItem('completedQuests', JSON.stringify(next));
+  await AsyncStorage.setItem(COMPLETED_KEY, JSON.stringify(next));
   return next;
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-    flexGrow: 1,
-  },
-  title: {
-    fontSize: 26,
-    fontWeight: '700',
-    marginBottom: 20,
-  },
-  task: {
-    fontSize: 18,
-    textAlign: 'center',
-    marginBottom: 30,
-    paddingHorizontal: 10,
-  },
-  button: {
-    backgroundColor: '#2f80ed',
-    paddingVertical: 14,
-    paddingHorizontal: 28,
-    borderRadius: 10,
-    marginVertical: 10,
-    minWidth: 220,
-    alignItems: 'center',
-  },
-  buttonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  secondary: {
-    backgroundColor: '#efefef',
-  },
-
-  textSecondary: {
-    color: '#333',
-  },
-  congrats: {
-    fontSize: 22,
-    fontWeight: '700',
-    marginBottom: 10,
-    color: '#70AD8F',
-  },
-  streak: {
-    fontSize: 16,
-    marginBottom: 20,
-  },
+  container: { justifyContent: 'center', alignItems: 'center', padding: 20 },
+  title: { fontSize: 26, fontWeight: '700', marginBottom: 20 },
+  subtitle: { fontSize: 16, textAlign: 'center', marginBottom: 18 },
+  task: { fontSize: 18, textAlign: 'center', marginBottom: 30 },
+  button: { backgroundColor: '#2f80ed', paddingVertical: 14, paddingHorizontal: 28, borderRadius: 10, marginVertical: 10 },
+  buttonText: { color: '#fff', fontSize: 16, fontWeight: '600' },
+  secondary: { backgroundColor: '#efefef' },
+  textSecondary: { color: '#333' },
+  congrats: { fontSize: 22, fontWeight: '700', marginBottom: 10, color: '#70AD8F' },
+  streak: { fontSize: 16, marginBottom: 20 },
+  levelBarWrap: { width: '100%', alignItems: 'center', marginBottom: 8 },
+  levelText: { fontSize: 18, fontWeight: '700', marginBottom: 6 },
+  progressTrack: { width: '90%', height: 18, backgroundColor: '#e6e6e6', borderRadius: 10 },
+  progressFill: { height: '100%', backgroundColor: '#76c7c0' },
+  progressPercent: { marginTop: 6 },
+  small: { marginTop: 8 },
+  featureBox: { marginTop: 16, padding: 14, borderWidth: 1, borderRadius: 10, width: '100%', alignItems: 'center' },
+  featureTitle: { fontSize: 16, fontWeight: '700' },
+  featureDesc: { textAlign: 'center' },
+  secondaryButton: { backgroundColor: '#4CAF50', paddingVertical: 10, paddingHorizontal: 12, borderRadius: 8, marginTop: 10 },
+  secondaryButtonText: { color: '#fff', fontWeight: '700' },
 });
+
+const LevelBar: React.FC<LevelBarProps> = ({ level, progress }) => {
+  const clamped = Math.max(0, Math.min(100, progress));
+  return (
+    <View style={styles.levelBarWrap}>
+      <Text style={styles.levelText}>Level {level}</Text>
+      <View style={styles.progressTrack}>
+        <View style={[styles.progressFill, { width: `${clamped}%` }]} />
+      </View>
+      <Text style={styles.progressPercent}>{clamped}%</Text>
+    </View>
+  );
+};
 
 export default DailyQuestScreen;
