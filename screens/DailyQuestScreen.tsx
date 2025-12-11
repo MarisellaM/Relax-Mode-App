@@ -77,12 +77,6 @@ const DailyQuestScreen: React.FC<Props> = ({ navigation }) => {
   const [completed, setCompleted] = useState(0);
   const { level, progress } = computeLevel(completed);
 
-  useEffect(() => {
-    (async () => {
-      const raw = await AsyncStorage.getItem(COMPLETED_KEY);
-      setCompleted(raw ? JSON.parse(raw) : 0);
-    })();
-  }, []);
 
   const provideSuggestions = () => {
     Alert.alert("Suggestion", suggestionFromCompleted(completed));
@@ -98,6 +92,20 @@ const DailyQuestScreen: React.FC<Props> = ({ navigation }) => {
   useEffect(() => {
     setTask(TASKS[Math.floor(Math.random() * TASKS.length)]);
     loadStreak();
+
+    // load completed count and check whether user already completed today
+    (async () => {
+      const raw = await AsyncStorage.getItem(COMPLETED_KEY);
+      setCompleted(raw ? JSON.parse(raw) : 0);
+
+      const last = await AsyncStorage.getItem(LAST_COMPLETED_KEY);
+      const today = new Date().toISOString().split('T')[0];
+      if (last === today) {
+        // mark UI as completed for today and keep it shown until next day
+        setIsComplete(true);
+        fadeAnim.setValue(1);
+      }
+    })();
   }, []);
 
   const loadStreak = async () => {
@@ -116,15 +124,25 @@ const DailyQuestScreen: React.FC<Props> = ({ navigation }) => {
   };
 
   const handleComplete = async () => {
-    setIsComplete(true);
     setIsRunning(false);
 
     const last = await AsyncStorage.getItem(LAST_COMPLETED_KEY);
     const today = new Date().toISOString().split('T')[0];
 
+    // If already completed today, show the completed UI and avoid double-counting
+    if (last === today) {
+      setIsComplete(true);
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 600,
+        useNativeDriver: true,
+      }).start();
+      Alert.alert("Already counted", "You already completed a quest today.");
+      return;
+    }
+
     let newStreak = streak;
     if (!last) newStreak = streak + 1;
-    else if (last === today) Alert.alert("Already counted", "You already completed a quest today.");
     else {
       const diff = Math.floor((Date.now() - new Date(last).getTime()) / 86400000);
       newStreak = diff === 1 ? streak + 1 : 1;
@@ -138,6 +156,7 @@ const DailyQuestScreen: React.FC<Props> = ({ navigation }) => {
 
     await recordDailyQuestCompletion(QUEST_DURATION_SECONDS);
 
+    setIsComplete(true);
     Animated.timing(fadeAnim, {
       toValue: 1,
       duration: 600,

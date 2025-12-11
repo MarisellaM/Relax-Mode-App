@@ -113,26 +113,26 @@ function buildNextRunLabel(item: Routine): string {
     <View style={[styles.container, { backgroundColor: theme.backgroundColor }]}>
       <Text style={[styles.title, { color: theme.textColor }]}>My Routines</Text>
 
-      <TouchableOpacity style={styles.addButton} onPress={() => navigation.navigate('CreateRoutine')}>
-        <Text style={styles.addText}>+ Create Routine</Text>
+      <TouchableOpacity style={[styles.addButton, { backgroundColor: '#2f80ed' }]} onPress={() => navigation.navigate('CreateRoutine')}>
+        <Text style={[styles.addText, { color: '#fff' }]}>+ Create Routine</Text>
       </TouchableOpacity>
 
 <FlatList
   data={routines}
   keyExtractor={(item) => item.id}
   renderItem={({ item }) => (
-    <View style={styles.card}>
-      <Text style={styles.routineName}>{item.name}</Text>
+    <View style={[styles.card, { backgroundColor: theme.cardBackground, borderColor: theme.borderColor, borderWidth: 1 }] }>
+      <Text style={[styles.routineName, { color: theme.textColor }]}>{item.name}</Text>
 
-      <Text style={styles.meta}>
+      <Text style={[styles.meta, { color: theme.secondaryTextColor }]}>
         Days: {item.days.map((d) => ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][d]).join(', ')}
       </Text>
 
-      <Text style={styles.meta}>Time: {item.time ?? '—'}</Text>
+      <Text style={[styles.meta, { color: theme.secondaryTextColor }]}>Time: {item.time ?? '—'}</Text>
 
       {/* next run line */}
       {item.time && (
-        <Text style={[styles.meta, { fontStyle: 'italic', marginTop: 2 }]}>
+        <Text style={[styles.meta, { fontStyle: 'italic', marginTop: 2, color: theme.secondaryTextColor }]}> 
           {buildNextRunLabel(item)}
         </Text>
       )}
@@ -142,7 +142,7 @@ function buildNextRunLabel(item: Routine): string {
         {/* start routine button */}
         <TouchableOpacity
           onPress={() => navigation.navigate('RoutineTracker', { routineId: item.id })}
-          style={[styles.smallBtn, { backgroundColor: '#2ecc71' }]}
+          style={[styles.smallBtn, { backgroundColor: '#2ecc71', borderColor: '#27ae60' }]}
         >
           <Text style={{ color: 'white', fontWeight: '600' }}>Start</Text>
         </TouchableOpacity>
@@ -151,14 +151,14 @@ function buildNextRunLabel(item: Routine): string {
         <View style={{ flexDirection: 'row' }}>
           <TouchableOpacity
             onPress={() => navigation.navigate('CreateRoutine', { routine: item })}
-            style={styles.smallBtn}
+            style={[styles.smallBtn, { borderColor: theme.borderColor }]}
           >
-            <Text>Edit</Text>
+            <Text style={{ color: theme.textColor }}>Edit</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             onPress={() => handleDelete(item.id)}
-            style={[styles.smallBtn, styles.danger]}
+            style={[styles.smallBtn, styles.danger, { borderColor: '#e74c3c' }]}
           >
             <Text style={{ color: 'white' }}>Delete</Text>
           </TouchableOpacity>

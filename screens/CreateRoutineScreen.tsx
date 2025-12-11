@@ -137,7 +137,7 @@ export default function CreateRoutineScreen({ route, navigation }: Props) {
         onChangeText={setName}
         style={[styles.input, { backgroundColor: theme.cardBackground, borderColor: theme.borderColor, color: theme.textColor }]}
         placeholder="Evening Wind Down"
-        placeholderTextColor={theme.secondaryTextColor}
+        placeholderTextColor={theme.placeholderTextColor}
       />
 
       <Text style={[styles.label, { color: theme.textColor }]}>Days</Text>
@@ -146,16 +146,13 @@ export default function CreateRoutineScreen({ route, navigation }: Props) {
           <TouchableOpacity
             key={d}
             onPress={() => toggleDay(i)}
-            style={[styles.dayBtn, days.includes(i) && styles.dayActive]}
+            style={[
+              styles.dayBtn,
+              days.includes(i) && styles.dayActive,
+              { backgroundColor: days.includes(i) ? '#2f80ed' : theme.cardBackground, borderColor: theme.borderColor, borderWidth: days.includes(i) ? 0 : 1 },
+            ]}
           >
-            <Text
-              style={{
-                fontWeight: '600',
-                color: days.includes(i) ? '#fff' : '#000',
-              }}
-            >
-              {d}
-            </Text>
+                <Text style={{ fontWeight: '600', color: days.includes(i) ? '#fff' : theme.textColor }}>{d}</Text>
           </TouchableOpacity>
         ))}
       </View>
@@ -166,7 +163,7 @@ export default function CreateRoutineScreen({ route, navigation }: Props) {
         onChangeText={setTime}
         style={[styles.input, { backgroundColor: theme.cardBackground, borderColor: theme.borderColor, color: theme.textColor }]}
         placeholder="20:30"
-        placeholderTextColor={theme.secondaryTextColor}
+        placeholderTextColor={theme.placeholderTextColor}
       />
 
       <Text style={[styles.label, { color: theme.textColor }]}>Activities (one per line)</Text>
@@ -175,7 +172,7 @@ export default function CreateRoutineScreen({ route, navigation }: Props) {
         onChangeText={setItemsText}
         style={[styles.input, { minHeight: 120, backgroundColor: theme.cardBackground, borderColor: theme.borderColor, color: theme.textColor }]}
         placeholder={'Lighting candles\nDishes\n5 minute stretch'}
-        placeholderTextColor={theme.secondaryTextColor}
+        placeholderTextColor={theme.placeholderTextColor}
         multiline
       />
 
@@ -185,9 +182,13 @@ export default function CreateRoutineScreen({ route, navigation }: Props) {
           <TouchableOpacity
             key={s}
             onPress={() => setScene(s as any)}
-            style={[styles.sceneBtn, scene === s && styles.sceneActive]}
+            style={[
+              styles.sceneBtn,
+              scene === s && styles.sceneActive,
+              { backgroundColor: scene === s ? '#cfe1ff' : theme.cardBackground, borderColor: theme.borderColor, borderWidth: 1 },
+            ]}
           >
-            <Text>{s}</Text>
+            <Text style={{ color: theme.textColor }}>{s}</Text>
           </TouchableOpacity>
         ))}
       </View>
