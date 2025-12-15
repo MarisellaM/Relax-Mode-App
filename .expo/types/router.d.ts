@@ -1,3 +1,7 @@
+/**
+ * This file defines route typing and path mappings used by Expo Router
+ * to enable type-safe navigation throughout the app.
+ */
 /* eslint-disable */
 import * as Router from 'expo-router';
 
