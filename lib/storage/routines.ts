@@ -14,9 +14,11 @@ export type Routine = {
   name: string;
   days: number[];       // 0–6 (Sunday–Saturday)
   items: RoutineItem[];
-  time?: string;        // "HH:MM"
+  time?: string;        // "HH:MM" - deprecated, kept for backwards compatibility
+  times?: string[];     // array of "HH:MM" times for multiple schedules
   scene: RoutineScene;
-  lastRunAt?: number;
+  lastRunAt?: number;   // deprecated - kept for backwards compatibility
+  completions?: number[]; // array of timestamps for all completions
 };
 
 const ROUTINES_KEY = 'routines';

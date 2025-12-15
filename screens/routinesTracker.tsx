@@ -89,14 +89,16 @@ export default function RoutineTrackerScreen({ route, navigation }: Props) {
 
   async function markRoutineCompletedToday(r: Routine) {
     try {
+      const now = Date.now();
       const updatedRoutine: Routine = {
         ...r,
-        lastRunAt: Date.now(), // mark this routine as completed now
+        lastRunAt: now, // keep for backwards compatibility
+        completions: [...(r.completions || []), now], // add to completions array
       };
       await updateRoutine(updatedRoutine);
       setRoutine(updatedRoutine); // keep local state in sync
     } catch (e) {
-      console.warn('Failed to update routine lastRunAt', e);
+      console.warn('Failed to update routine completions', e);
     }
   }
 

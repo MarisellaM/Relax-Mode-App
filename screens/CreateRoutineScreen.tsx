@@ -12,6 +12,7 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/RootNavigator';
 import { addRoutine, updateRoutine, Routine } from '../lib/storage/routines';
 import { useTheme } from '../lib/ThemeContext';
+import { to24Hour, to12Hour, isValid12HourTime } from '../lib/timeUtils';
 
 
 type Props = NativeStackScreenProps<RootStackParamList, 'CreateRoutine'>;
@@ -25,7 +26,10 @@ export default function CreateRoutineScreen({ route, navigation }: Props) {
 
   const [name, setName] = useState(existing?.name ?? '');
   const [days, setDays] = useState<number[]>(existing?.days ?? [1, 2, 3, 4, 5]); // default weekdays
-  const [time, setTime] = useState(existing?.time ?? '20:30');
+  const [times, setTimes] = useState<string[]>(
+    existing?.times ?? (existing?.time ? [existing.time] : ['20:30'])
+  );
+  const [newTimeInput, setNewTimeInput] = useState('');
   const [itemsText, setItemsText] = useState(
     (existing?.items ?? []).map((i) => i.title).join('\n')
   );
@@ -41,13 +45,47 @@ export default function CreateRoutineScreen({ route, navigation }: Props) {
     );
   }
 
+  function addTime() {
+    if (!newTimeInput || !newTimeInput.trim()) {
+      Alert.alert('Enter a time', 'Please enter a time with AM/PM (e.g., 8:30 PM).');
+      return;
+    }
+
+    const input = newTimeInput.trim();
+
+    // Validate 12-hour format with AM/PM
+    if (!isValid12HourTime(input)) {
+      Alert.alert(
+        'Invalid format',
+        'Please use 12-hour format with AM/PM.\n\nExamples:\n• 8:30 AM\n• 2:45 PM\n• 11:00 PM'
+      );
+      return;
+    }
+
+    // Convert to 24-hour format for storage
+    const time24 = to24Hour(input);
+
+    // Check for duplicates
+    if (times.includes(time24)) {
+      Alert.alert('Duplicate time', 'This time has already been added.');
+      return;
+    }
+
+    setTimes(prev => [...prev, time24].sort());
+    setNewTimeInput('');
+  }
+
+  function removeTime(timeToRemove: string) {
+    setTimes(prev => prev.filter(t => t !== timeToRemove));
+  }
+
   async function save() {
     console.log('[CreateRoutine] save() pressed');
     console.log('[CreateRoutine] current state:', {
       name,
       itemsText,
       days,
-      time,
+      times,
       scene,
     });
 
@@ -83,13 +121,13 @@ export default function CreateRoutineScreen({ route, navigation }: Props) {
     let routine: Routine;
     try {
     routine = existing
-        ? { ...existing, name, days, items, time, scene }
+        ? { ...existing, name, days, items, times, scene }
         : {
             id: `routine-${Date.now()}-${Math.floor(Math.random() * 100000)}`, // ✅ replaced uuidv4()
             name,
             days,
             items,
-            time,
+            times,
             scene,
         };
     console.log('[CreateRoutine] routine to save:', routine);
@@ -112,13 +150,29 @@ export default function CreateRoutineScreen({ route, navigation }: Props) {
       }
 
       console.log('[CreateRoutine] save successful, showing alert');
-      Alert.alert(
-        'Routine saved',
-        existing
-          ? 'Your routine has been updated.'
-          : 'Your routine has been created.',
-        [{ text: 'OK', onPress: () => navigation.goBack() }]
-      );
+
+      if (existing) {
+        // Updated existing routine
+        Alert.alert(
+          '✓ Routine Updated',
+          `"${name}" has been successfully updated.`,
+          [{ text: 'OK', onPress: () => navigation.goBack() }]
+        );
+      } else {
+        // Created new routine - more detailed confirmation
+        const daysText = days.map(d => ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][d]).join(', ');
+        const timesText = times.map(t => to12Hour(t)).join(', ');
+
+        Alert.alert(
+          '🎉 Routine Created!',
+          `"${name}" has been successfully created!\n\n` +
+          `📅 Days: ${daysText}\n` +
+          `⏰ Times: ${timesText}\n` +
+          `✨ Activities: ${items.length} steps\n\n` +
+          `You'll receive reminders when it's time to start your routine.`,
+          [{ text: 'Got it!', onPress: () => navigation.goBack() }]
+        );
+      }
     } catch (e) {
       console.warn('Failed to save routine', e);
       Alert.alert(
@@ -157,14 +211,40 @@ export default function CreateRoutineScreen({ route, navigation }: Props) {
         ))}
       </View>
 
-      <Text style={[styles.label, { color: theme.textColor }]}>Time (HH:MM)</Text>
-      <TextInput
-        value={time}
-        onChangeText={setTime}
-        style={[styles.input, { backgroundColor: theme.cardBackground, borderColor: theme.borderColor, color: theme.textColor }]}
-        placeholder="20:30"
-        placeholderTextColor={theme.placeholderTextColor}
-      />
+      <Text style={[styles.label, { color: theme.textColor }]}>Scheduled Times</Text>
+
+      {/* Display existing times */}
+      {times.length > 0 && (
+        <View style={{ marginBottom: 12 }}>
+          {times.map((t, idx) => (
+            <View key={idx} style={[styles.timeChip, { backgroundColor: theme.cardBackground, borderColor: theme.borderColor }]}>
+              <Text style={{ color: theme.textColor, fontSize: 16, fontWeight: '600' }}>
+                {to12Hour(t)}
+              </Text>
+              <TouchableOpacity onPress={() => removeTime(t)} style={styles.removeTimeBtn}>
+                <Text style={{ color: '#e74c3c', fontWeight: '600', fontSize: 24 }}>×</Text>
+              </TouchableOpacity>
+            </View>
+          ))}
+        </View>
+      )}
+
+      {/* Add new time */}
+      <View style={{ flexDirection: 'row', marginBottom: 12 }}>
+        <TextInput
+          value={newTimeInput}
+          onChangeText={setNewTimeInput}
+          style={[styles.input, { flex: 1, marginRight: 8, backgroundColor: theme.cardBackground, borderColor: theme.borderColor, color: theme.textColor }]}
+          placeholder="8:30 PM"
+          placeholderTextColor={theme.placeholderTextColor}
+        />
+        <TouchableOpacity onPress={addTime} style={[styles.addTimeBtn, { backgroundColor: '#2f80ed' }]}>
+          <Text style={{ color: 'white', fontWeight: '600' }}>+ Add</Text>
+        </TouchableOpacity>
+      </View>
+      <Text style={{ fontSize: 12, color: theme.secondaryTextColor, marginBottom: 12, fontStyle: 'italic' }}>
+        Use 12-hour format with AM/PM (e.g., 8:30 AM, 2:45 PM, 11:00 PM)
+      </Text>
 
       <Text style={[styles.label, { color: theme.textColor }]}>Activities (one per line)</Text>
       <TextInput
@@ -219,6 +299,26 @@ const styles = StyleSheet.create({
     backgroundColor: '#f0f0f0',
   },
   dayActive: { backgroundColor: '#2f80ed' },
+  timeChip: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 12,
+    borderRadius: 8,
+    borderWidth: 1,
+    marginBottom: 8,
+  },
+  removeTimeBtn: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+  },
+  addTimeBtn: {
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   sceneBtn: {
     padding: 10,
     marginRight: 8,

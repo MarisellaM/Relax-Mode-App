@@ -5,6 +5,7 @@ import { Routine, loadRoutines, removeRoutine } from '../lib/storage/routines';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/RootNavigator';
 import { useTheme } from '../lib/ThemeContext';
+import { to12Hour } from '../lib/timeUtils';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Routines'>;
 
@@ -28,27 +29,21 @@ export default function RoutinesScreen({ navigation }: Props) {
       const WINDOW_MIN = 15;
 
       const due = all.find(r => {
-        if (!r.time) return false;
         if (!r.days.includes(todayIndex)) return false;
 
-        // skip if already completed today
-        if (r.lastRunAt) {
-          const last = new Date(r.lastRunAt);
-          const sameDay =
-            last.getFullYear() === now.getFullYear() &&
-            last.getMonth() === now.getMonth() &&
-            last.getDate() === now.getDate();
-          if (sameDay) {
-            return false;
-          }
-        }
+        // Get all times (support both old 'time' and new 'times' array)
+        const times = r.times && r.times.length > 0 ? r.times : (r.time ? [r.time] : []);
+        if (times.length === 0) return false;
 
-        const [hh, mm] = r.time.split(':').map(n => parseInt(n, 10));
-        if (isNaN(hh) || isNaN(mm)) return false;
+        // Check if any of the scheduled times is within the window
+        return times.some(time => {
+          const [hh, mm] = time.split(':').map(n => parseInt(n, 10));
+          if (isNaN(hh) || isNaN(mm)) return false;
 
-        const routineMinutes = hh * 60 + mm;
-        const diff = Math.abs(routineMinutes - currentMinutes);
-        return diff <= WINDOW_MIN;
+          const routineMinutes = hh * 60 + mm;
+          const diff = Math.abs(routineMinutes - currentMinutes);
+          return diff <= WINDOW_MIN;
+        });
       });
 
       if (due) {
@@ -96,17 +91,33 @@ function formatDaysShort(days: number[]) {
   return days.map(d => labels[d]).join(', ');
 }
 
-// simple next-run label: just shows “Next: Today at 20:30” or “Next: Mon, Wed at 20:30”
+// Get all scheduled times for display (support both old 'time' and new 'times')
+function getAllTimes(item: Routine): string[] {
+  if (item.times && item.times.length > 0) {
+    return item.times;
+  }
+  if (item.time) {
+    return [item.time];
+  }
+  return [];
+}
+
+// simple next-run label: just shows "Next: Today at 8:30 PM" or "Next: Mon, Wed at 8:30 PM"
 function buildNextRunLabel(item: Routine): string {
-  if (!item.time) return '';
+  const times = getAllTimes(item);
+  if (times.length === 0) return '';
+
   const now = new Date();
   const todayIndex = now.getDay(); // 0-6 (Sun-Sat)
 
+  // Convert times to 12-hour format for display
+  const times12 = times.map(t => to12Hour(t));
+
   const hasToday = item.days.includes(todayIndex);
   if (hasToday) {
-    return `Next: Today at ${item.time}`;
+    return `Next: Today at ${times12.join(', ')}`;
   }
-  return `Next: ${formatDaysShort(item.days)} at ${item.time}`;
+  return `Next: ${formatDaysShort(item.days)} at ${times12.join(', ')}`;
 }
 
   return (
@@ -128,11 +139,13 @@ function buildNextRunLabel(item: Routine): string {
         Days: {item.days.map((d) => ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][d]).join(', ')}
       </Text>
 
-      <Text style={[styles.meta, { color: theme.secondaryTextColor }]}>Time: {item.time ?? '—'}</Text>
+      <Text style={[styles.meta, { color: theme.secondaryTextColor }]}>
+        Times: {getAllTimes(item).map(t => to12Hour(t)).join(', ') || '—'}
+      </Text>
 
       {/* next run line */}
-      {item.time && (
-        <Text style={[styles.meta, { fontStyle: 'italic', marginTop: 2, color: theme.secondaryTextColor }]}> 
+      {getAllTimes(item).length > 0 && (
+        <Text style={[styles.meta, { fontStyle: 'italic', marginTop: 2, color: theme.secondaryTextColor }]}>
           {buildNextRunLabel(item)}
         </Text>
       )}
